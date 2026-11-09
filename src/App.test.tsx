@@ -14,6 +14,7 @@ const artPieces: ArtPiece[] = [
     artist: "Vincent van Gogh",
     name: "Wheat Field with Cypresses",
     imageSource: "https://example.com/wheat-field.jpg",
+    colors: ["#37412E", "#8D7332", "#838665", "#718F98", "#9DA59E"],
   },
   {
     slug: "the-harvesters",
@@ -22,6 +23,7 @@ const artPieces: ArtPiece[] = [
     artist: "Pieter Bruegel the Elder",
     name: "The Harvesters",
     imageSource: "https://example.com/the-harvesters.jpg",
+    colors: ["#4D3C25", "#9A692E", "#7C8263", "#B78D53", "#C7B7A4"],
   },
 ];
 
