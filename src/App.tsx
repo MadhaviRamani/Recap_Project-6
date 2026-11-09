@@ -2,6 +2,7 @@ import { Route, Routes } from "react-router";
 import useSWR from "swr";
 
 import ArtPieces from "./components/ArtPieces";
+import Navigation from "./components/Navigation";
 import Spotlight from "./components/Spotlight";
 import type { ArtPiece } from "./types";
 import "./styles.css";
@@ -25,24 +26,14 @@ export default function App() {
     fetcher
   );
 
+  let content;
+
   if (error) {
-    return (
-      <main>
-        <p role="alert">Could not load the art pieces. Please try again.</p>
-      </main>
+    content = (
+      <p role="alert">Could not load the art pieces. Please try again.</p>
     );
-  }
-
-  if (!artPieces) {
-    return (
-      <main>
-        <p>Loading…</p>
-      </main>
-    );
-  }
-
-  return (
-    <main>
+  } else if (artPieces) {
+    content = (
       <Routes>
         <Route
           path="/"
@@ -62,7 +53,18 @@ export default function App() {
             </>
           }
         />
+        <Route path="*" element={<h1>Page not found</h1>} />
       </Routes>
-    </main>
+    );
+  } else {
+    content = <p>Loading…</p>;
+  }
+
+  return (
+    <>
+      <main>{content}</main>
+      {/* rendered once, outside the routes, so it appears on every page */}
+      <Navigation />
+    </>
   );
 }
