@@ -7,7 +7,7 @@ import ArtPieces from "./components/ArtPieces";
 import Navigation from "./components/Navigation";
 import Spotlight from "./components/Spotlight";
 import type { ArtPiece, ArtPieceInfo } from "./types";
-import { toggleFavorite } from "./utils/artPiecesInfo";
+import { isFavorite, toggleFavorite } from "./utils/artPiecesInfo";
 import "./styles.css";
 
 const API_URL = "https://example-apis.vercel.app/api/art";
@@ -78,6 +78,21 @@ export default function App() {
               artPiecesInfo={artPiecesInfo}
               onToggleFavorite={handleToggleFavorite}
             />
+          }
+        />
+        <Route
+          path="/favorites"
+          element={
+            <>
+              <h1>Favorites</h1>
+              <ArtPieces
+                artPieces={artPieces.filter((artPiece) =>
+                  isFavorite(artPiecesInfo, artPiece.slug)
+                )}
+                artPiecesInfo={artPiecesInfo}
+                onToggleFavorite={handleToggleFavorite}
+              />
+            </>
           }
         />
         <Route path="*" element={<h1>Page not found</h1>} />
