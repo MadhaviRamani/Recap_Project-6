@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Route, Routes } from "react-router";
 import useSWR from "swr";
 
@@ -5,7 +6,8 @@ import ArtPieceDetails from "./components/ArtPieceDetails";
 import ArtPieces from "./components/ArtPieces";
 import Navigation from "./components/Navigation";
 import Spotlight from "./components/Spotlight";
-import type { ArtPiece } from "./types";
+import type { ArtPiece, ArtPieceInfo } from "./types";
+import { toggleFavorite } from "./utils/artPiecesInfo";
 import "./styles.css";
 
 const API_URL = "https://example-apis.vercel.app/api/art";
@@ -26,6 +28,12 @@ export default function App() {
     API_URL,
     fetcher
   );
+  // own information (favorites), shared by all routes; the fetched art pieces stay unchanged
+  const [artPiecesInfo, setArtPiecesInfo] = useState<ArtPieceInfo[]>([]);
+
+  function handleToggleFavorite(slug: string) {
+    setArtPiecesInfo((currentInfo) => toggleFavorite(currentInfo, slug));
+  }
 
   let content;
 
@@ -41,7 +49,11 @@ export default function App() {
           element={
             <>
               <h1>Spotlight</h1>
-              <Spotlight artPieces={artPieces} />
+              <Spotlight
+                artPieces={artPieces}
+                artPiecesInfo={artPiecesInfo}
+                onToggleFavorite={handleToggleFavorite}
+              />
             </>
           }
         />
@@ -50,13 +62,23 @@ export default function App() {
           element={
             <>
               <h1>Gallery</h1>
-              <ArtPieces artPieces={artPieces} />
+              <ArtPieces
+                artPieces={artPieces}
+                artPiecesInfo={artPiecesInfo}
+                onToggleFavorite={handleToggleFavorite}
+              />
             </>
           }
         />
         <Route
           path="/art-pieces/:slug"
-          element={<ArtPieceDetails artPieces={artPieces} />}
+          element={
+            <ArtPieceDetails
+              artPieces={artPieces}
+              artPiecesInfo={artPiecesInfo}
+              onToggleFavorite={handleToggleFavorite}
+            />
+          }
         />
         <Route path="*" element={<h1>Page not found</h1>} />
       </Routes>

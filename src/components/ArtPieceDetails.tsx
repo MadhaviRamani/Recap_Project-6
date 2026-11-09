@@ -1,12 +1,20 @@
 import { useNavigate, useParams } from "react-router";
 
-import type { ArtPiece } from "../types";
+import type { ArtPiece, ArtPieceInfo } from "../types";
+import { isFavorite } from "../utils/artPiecesInfo";
+import FavoriteButton from "./FavoriteButton";
 
 type ArtPieceDetailsProps = {
   artPieces: ArtPiece[];
+  artPiecesInfo: ArtPieceInfo[];
+  onToggleFavorite: (slug: string) => void;
 };
 
-export default function ArtPieceDetails({ artPieces }: ArtPieceDetailsProps) {
+export default function ArtPieceDetails({
+  artPieces,
+  artPiecesInfo,
+  onToggleFavorite,
+}: ArtPieceDetailsProps) {
   const { slug } = useParams();
   const navigate = useNavigate();
   const artPiece = artPieces.find((piece) => piece.slug === slug);
@@ -32,6 +40,10 @@ export default function ArtPieceDetails({ artPieces }: ArtPieceDetailsProps) {
   return (
     <section className="details">
       {backButton}
+      <FavoriteButton
+        isFavorite={isFavorite(artPiecesInfo, artPiece.slug)}
+        onToggleFavorite={() => onToggleFavorite(artPiece.slug)}
+      />
       <img src={imageSource} alt={`${name} by ${artist}`} />
       <h1>{name}</h1>
       <dl>

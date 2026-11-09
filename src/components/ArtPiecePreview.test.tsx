@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
 
 import type { ArtPiece } from "../types";
@@ -15,10 +16,14 @@ const artPiece: ArtPiece = {
 };
 
 // the preview contains a Link, which needs a router
-function renderPreview() {
+function renderPreview(isFavorite = false, onToggleFavorite = vi.fn()) {
   render(
     <MemoryRouter>
-      <ArtPiecePreview artPiece={artPiece} />
+      <ArtPiecePreview
+        artPiece={artPiece}
+        isFavorite={isFavorite}
+        onToggleFavorite={onToggleFavorite}
+      />
     </MemoryRouter>
   );
 }
@@ -53,4 +58,23 @@ test("links to the details page of the art piece", () => {
     "href",
     "/art-pieces/wheat-field-with-cypresses"
   );
+});
+
+test("shows the favorite button with the favorite status", () => {
+  renderPreview(true);
+
+  expect(screen.getByRole("button", { name: "Favorite" })).toHaveAttribute(
+    "aria-pressed",
+    "true"
+  );
+});
+
+test("clicking the favorite button toggles the favorite of this art piece", async () => {
+  const user = userEvent.setup();
+  const onToggleFavorite = vi.fn();
+  renderPreview(false, onToggleFavorite);
+
+  await user.click(screen.getByRole("button", { name: "Favorite" }));
+
+  expect(onToggleFavorite).toHaveBeenCalledWith("wheat-field-with-cypresses");
 });
