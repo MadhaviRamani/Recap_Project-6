@@ -44,6 +44,7 @@ function renderApp(route = "/art-pieces") {
 
 afterEach(() => {
   vi.unstubAllGlobals();
+  vi.restoreAllMocks();
 });
 
 test("shows a loading state while the art pieces are fetched", async () => {
@@ -89,4 +90,21 @@ test("fetcher returns the art pieces when the response is ok", async () => {
   mockFetch({ ok: true, data: artPieces });
 
   await expect(fetcher("/api/art")).resolves.toEqual(artPieces);
+});
+
+test("shows a random art piece as spotlight on the route /", async () => {
+  mockFetch({ ok: true, data: artPieces });
+  vi.spyOn(crypto, "getRandomValues").mockImplementation((array) => {
+    (array as Uint32Array)[0] = 1;
+    return array;
+  });
+
+  renderApp("/");
+
+  expect(
+    await screen.findByRole("img", {
+      name: "The Harvesters by Pieter Bruegel the Elder",
+    })
+  ).toBeInTheDocument();
+  expect(screen.getByText("Pieter Bruegel the Elder")).toBeInTheDocument();
 });
