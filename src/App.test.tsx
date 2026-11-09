@@ -9,12 +9,16 @@ import type { ArtPiece } from "./types";
 const artPieces: ArtPiece[] = [
   {
     slug: "wheat-field-with-cypresses",
+    year: "1889",
+    genre: "Landscape Painting",
     artist: "Vincent van Gogh",
     name: "Wheat Field with Cypresses",
     imageSource: "https://example.com/wheat-field.jpg",
   },
   {
     slug: "the-harvesters",
+    year: "1565",
+    genre: "Genre Painting",
     artist: "Pieter Bruegel the Elder",
     name: "The Harvesters",
     imageSource: "https://example.com/the-harvesters.jpg",
@@ -156,4 +160,18 @@ test("shows the navigation while the art pieces are loading", async () => {
   expect(screen.getByRole("navigation")).toBeInTheDocument();
   // let the fetch finish inside the test
   await screen.findAllByRole("listitem");
+});
+
+test("clicking an art piece in the gallery shows its details", async () => {
+  const user = userEvent.setup();
+  mockFetch({ ok: true, data: artPieces });
+
+  renderApp("/art-pieces");
+  await user.click(await screen.findByRole("link", { name: /The Harvesters/ }));
+
+  expect(
+    screen.getByRole("heading", { level: 1, name: "The Harvesters" })
+  ).toBeInTheDocument();
+  expect(screen.getByText("1565")).toBeInTheDocument();
+  expect(screen.getByText("Genre Painting")).toBeInTheDocument();
 });
