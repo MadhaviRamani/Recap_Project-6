@@ -7,7 +7,13 @@ import ArtPieces from "./components/ArtPieces";
 import Navigation from "./components/Navigation";
 import Spotlight from "./components/Spotlight";
 import type { ArtPiece, ArtPieceInfo } from "./types";
-import { isFavorite, toggleFavorite } from "./utils/artPiecesInfo";
+import {
+  addComment,
+  deleteComment,
+  editComment,
+  isFavorite,
+  toggleFavorite,
+} from "./utils/artPiecesInfo";
 import "./styles.css";
 
 const API_URL = "https://example-apis.vercel.app/api/art";
@@ -28,11 +34,28 @@ export default function App() {
     API_URL,
     fetcher
   );
-  // own information (favorites), shared by all routes; the fetched art pieces stay unchanged
+  // own information (favorites, comments), shared by all routes; the fetched art pieces stay unchanged
   const [artPiecesInfo, setArtPiecesInfo] = useState<ArtPieceInfo[]>([]);
 
   function handleToggleFavorite(slug: string) {
     setArtPiecesInfo((currentInfo) => toggleFavorite(currentInfo, slug));
+  }
+
+  function handleAddComment(slug: string, text: string) {
+    const comment = {
+      id: crypto.randomUUID(),
+      text,
+      date: new Date().toISOString(),
+    };
+    setArtPiecesInfo((currentInfo) => addComment(currentInfo, slug, comment));
+  }
+
+  function handleEditComment(slug: string, id: string, text: string) {
+    setArtPiecesInfo((currentInfo) => editComment(currentInfo, slug, id, text));
+  }
+
+  function handleDeleteComment(slug: string, id: string) {
+    setArtPiecesInfo((currentInfo) => deleteComment(currentInfo, slug, id));
   }
 
   let content;
@@ -77,6 +100,9 @@ export default function App() {
               artPieces={artPieces}
               artPiecesInfo={artPiecesInfo}
               onToggleFavorite={handleToggleFavorite}
+              onAddComment={handleAddComment}
+              onEditComment={handleEditComment}
+              onDeleteComment={handleDeleteComment}
             />
           }
         />
