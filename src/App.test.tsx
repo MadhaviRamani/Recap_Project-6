@@ -211,3 +211,56 @@ test("the favorite status is shared between the pages", async () => {
     "true"
   );
 });
+
+test("the Favorites page shows only the favorite art pieces", async () => {
+  const user = userEvent.setup();
+  mockFetch({ ok: true, data: artPieces });
+
+  renderApp("/art-pieces");
+  const buttons = await screen.findAllByRole("button", { name: "Favorite" });
+  // mark "The Harvesters" in the gallery, then open the Favorites page
+  await user.click(buttons[1]);
+  await user.click(screen.getByRole("link", { name: "Favorites" }));
+
+  expect(
+    screen.getByRole("heading", { level: 1, name: "Favorites" })
+  ).toBeInTheDocument();
+  expect(screen.getAllByRole("listitem")).toHaveLength(1);
+  expect(
+    screen.getByRole("img", {
+      name: "The Harvesters by Pieter Bruegel the Elder",
+    })
+  ).toBeInTheDocument();
+  expect(
+    screen.getByRole("heading", { name: "The Harvesters" })
+  ).toBeInTheDocument();
+  expect(screen.getByText("Pieter Bruegel the Elder")).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: "Favorite" })).toHaveAttribute(
+    "aria-pressed",
+    "true"
+  );
+});
+
+test("removing a favorite on the Favorites page removes it from the list", async () => {
+  const user = userEvent.setup();
+  mockFetch({ ok: true, data: artPieces });
+
+  renderApp("/art-pieces");
+  const buttons = await screen.findAllByRole("button", { name: "Favorite" });
+  await user.click(buttons[1]);
+  await user.click(screen.getByRole("link", { name: "Favorites" }));
+  await user.click(screen.getByRole("button", { name: "Favorite" }));
+
+  expect(screen.queryAllByRole("listitem")).toHaveLength(0);
+});
+
+test("the Favorites page shows an empty list without favorites", async () => {
+  mockFetch({ ok: true, data: artPieces });
+
+  renderApp("/favorites");
+
+  expect(
+    await screen.findByRole("heading", { level: 1, name: "Favorites" })
+  ).toBeInTheDocument();
+  expect(screen.queryAllByRole("listitem")).toHaveLength(0);
+});

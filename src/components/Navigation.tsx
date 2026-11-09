@@ -8,6 +8,7 @@ export default function Navigation() {
         Spotlight
       </NavLink>
       <NavLink to="/art-pieces">Gallery</NavLink>
+      <NavLink to="/favorites">Favorites</NavLink>
     </nav>
   );
 }
