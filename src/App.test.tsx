@@ -264,3 +264,33 @@ test("the Favorites page shows an empty list without favorites", async () => {
   ).toBeInTheDocument();
   expect(screen.queryAllByRole("listitem")).toHaveLength(0);
 });
+
+test("a comment can be added, edited and deleted on one art piece only", async () => {
+  const user = userEvent.setup();
+  mockFetch({ ok: true, data: artPieces });
+
+  renderApp("/art-pieces/the-harvesters");
+  await user.type(await screen.findByLabelText("Add comment"), "Golden fields");
+  await user.click(screen.getByRole("button", { name: "Send" }));
+
+  expect(screen.getByText("Golden fields")).toBeInTheDocument();
+
+  await user.click(screen.getByRole("button", { name: "Edit" }));
+  await user.type(screen.getByLabelText("Edit comment"), "!");
+  await user.click(screen.getByRole("button", { name: "Save" }));
+  expect(screen.getByText("Golden fields!")).toBeInTheDocument();
+
+  // the other art piece has no comments
+  await user.click(screen.getByRole("link", { name: "Gallery" }));
+  await user.click(
+    screen.getByRole("link", { name: /Wheat Field with Cypresses/ })
+  );
+  expect(screen.getByText("No comments yet.")).toBeInTheDocument();
+
+  // back on the first art piece, the comment is still there and can be deleted
+  await user.click(screen.getByRole("link", { name: "Gallery" }));
+  await user.click(screen.getByRole("link", { name: /The Harvesters/ }));
+  expect(screen.getByText("Golden fields!")).toBeInTheDocument();
+  await user.click(screen.getByRole("button", { name: "Delete" }));
+  expect(screen.getByText("No comments yet.")).toBeInTheDocument();
+});

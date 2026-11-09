@@ -50,7 +50,9 @@ test("shows a favorite button on each entry and highlights the favorites", () =>
     <MemoryRouter>
       <ArtPieces
         artPieces={artPieces}
-        artPiecesInfo={[{ slug: "the-harvesters", isFavorite: true }]}
+        artPiecesInfo={[
+          { slug: "the-harvesters", isFavorite: true, comments: [] },
+        ]}
         onToggleFavorite={vi.fn()}
       />
     </MemoryRouter>

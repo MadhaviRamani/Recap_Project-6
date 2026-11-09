@@ -1,19 +1,27 @@
 import { useNavigate, useParams } from "react-router";
 
 import type { ArtPiece, ArtPieceInfo } from "../types";
-import { isFavorite } from "../utils/artPiecesInfo";
+import { getComments, isFavorite } from "../utils/artPiecesInfo";
+import CommentForm from "./CommentForm";
+import Comments from "./Comments";
 import FavoriteButton from "./FavoriteButton";
 
 type ArtPieceDetailsProps = {
   artPieces: ArtPiece[];
   artPiecesInfo: ArtPieceInfo[];
   onToggleFavorite: (slug: string) => void;
+  onAddComment: (slug: string, text: string) => void;
+  onEditComment: (slug: string, id: string, text: string) => void;
+  onDeleteComment: (slug: string, id: string) => void;
 };
 
 export default function ArtPieceDetails({
   artPieces,
   artPiecesInfo,
   onToggleFavorite,
+  onAddComment,
+  onEditComment,
+  onDeleteComment,
 }: ArtPieceDetailsProps) {
   const { slug } = useParams();
   const navigate = useNavigate();
@@ -54,6 +62,12 @@ export default function ArtPieceDetails({
         <dt>Genre</dt>
         <dd>{genre}</dd>
       </dl>
+      <Comments
+        comments={getComments(artPiecesInfo, artPiece.slug)}
+        onEditComment={(id, text) => onEditComment(artPiece.slug, id, text)}
+        onDeleteComment={(id) => onDeleteComment(artPiece.slug, id)}
+      />
+      <CommentForm onAddComment={(text) => onAddComment(artPiece.slug, text)} />
     </section>
   );
 }
