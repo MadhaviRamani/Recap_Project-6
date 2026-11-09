@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
 import { SWRConfig } from "swr";
 
@@ -107,4 +108,52 @@ test("shows a random art piece as spotlight on the route /", async () => {
     })
   ).toBeInTheDocument();
   expect(screen.getByText("Pieter Bruegel the Elder")).toBeInTheDocument();
+});
+
+test("clicking Gallery shows the Gallery page", async () => {
+  const user = userEvent.setup();
+  mockFetch({ ok: true, data: artPieces });
+
+  renderApp("/");
+  await user.click(await screen.findByRole("link", { name: "Gallery" }));
+
+  expect(
+    await screen.findByRole("heading", { level: 1, name: "Gallery" })
+  ).toBeInTheDocument();
+  expect(screen.getAllByRole("listitem")).toHaveLength(2);
+});
+
+test("clicking Spotlight shows the Spotlight page", async () => {
+  const user = userEvent.setup();
+  mockFetch({ ok: true, data: artPieces });
+
+  renderApp("/art-pieces");
+  await screen.findAllByRole("listitem");
+  await user.click(screen.getByRole("link", { name: "Spotlight" }));
+
+  expect(
+    screen.getByRole("heading", { level: 1, name: "Spotlight" })
+  ).toBeInTheDocument();
+  expect(screen.queryByRole("list")).not.toBeInTheDocument();
+});
+
+test("shows Page not found for an unknown URL", async () => {
+  mockFetch({ ok: true, data: artPieces });
+
+  renderApp("/does-not-exist");
+
+  expect(
+    await screen.findByRole("heading", { name: "Page not found" })
+  ).toBeInTheDocument();
+});
+
+test("shows the navigation while the art pieces are loading", async () => {
+  mockFetch({ ok: true, data: artPieces });
+
+  renderApp();
+
+  expect(screen.getByText("Loading…")).toBeInTheDocument();
+  expect(screen.getByRole("navigation")).toBeInTheDocument();
+  // let the fetch finish inside the test
+  await screen.findAllByRole("listitem");
 });
