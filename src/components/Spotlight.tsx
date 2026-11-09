@@ -21,6 +21,7 @@ export default function Spotlight({ artPieces }: SpotlightProps) {
     <figure className="art-piece spotlight">
       <img src={imageSource} alt={`${name} by ${artist}`} />
       <figcaption>
+        <h2>{name}</h2>
         <p>{artist}</p>
       </figcaption>
     </figure>

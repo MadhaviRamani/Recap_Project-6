@@ -43,6 +43,16 @@ test("shows the image of the randomly selected art piece", () => {
   );
 });
 
+test("shows the title of the randomly selected art piece", () => {
+  mockRandomValue(1);
+
+  render(<Spotlight artPieces={artPieces} />);
+
+  expect(
+    screen.getByRole("heading", { name: "The Harvesters" })
+  ).toBeInTheDocument();
+});
+
 test("shows the artist of the randomly selected art piece", () => {
   mockRandomValue(0);
 
