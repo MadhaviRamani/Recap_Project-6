@@ -53,6 +53,11 @@ nav a.active {
   margin: 0;
 }
 
+.art-piece a {
+  color: inherit;
+  text-decoration: none;
+}
+
 .art-piece img {
   display: block;
   width: 100%;

@@ -6,12 +6,16 @@ import Spotlight from "./Spotlight";
 const artPieces: ArtPiece[] = [
   {
     slug: "wheat-field-with-cypresses",
+    year: "1889",
+    genre: "Landscape Painting",
     artist: "Vincent van Gogh",
     name: "Wheat Field with Cypresses",
     imageSource: "https://example.com/wheat-field.jpg",
   },
   {
     slug: "the-harvesters",
+    year: "1565",
+    genre: "Genre Painting",
     artist: "Pieter Bruegel the Elder",
     name: "The Harvesters",
     imageSource: "https://example.com/the-harvesters.jpg",
