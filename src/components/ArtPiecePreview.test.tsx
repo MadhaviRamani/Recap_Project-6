@@ -13,6 +13,7 @@ const artPiece: ArtPiece = {
   name: "Wheat Field with Cypresses",
   imageSource:
     "https://example-apis.vercel.app/assets/art/wheat-field-with-cypresses.jpg",
+  colors: ["#37412E", "#8D7332", "#838665", "#718F98", "#9DA59E"],
 };
 
 // the preview contains a Link, which needs a router

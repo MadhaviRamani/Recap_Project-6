@@ -5,6 +5,7 @@ export type ArtPiece = {
   imageSource: string;
   year: string;
   genre: string;
+  colors: string[];
 };
 
 // the date is stored as an ISO string and only formatted for display

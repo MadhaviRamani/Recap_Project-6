@@ -9,6 +9,7 @@ const artPieces: ArtPiece[] = [
     artist: "Vincent van Gogh",
     name: "Wheat Field with Cypresses",
     imageSource: "https://example.com/wheat-field.jpg",
+    colors: ["#37412E", "#8D7332", "#838665", "#718F98", "#9DA59E"],
   },
   {
     slug: "the-harvesters",
@@ -17,6 +18,7 @@ const artPieces: ArtPiece[] = [
     artist: "Pieter Bruegel the Elder",
     name: "The Harvesters",
     imageSource: "https://example.com/the-harvesters.jpg",
+    colors: ["#4D3C25", "#9A692E", "#7C8263", "#B78D53", "#C7B7A4"],
   },
   {
     slug: "the-night-watch",
@@ -25,6 +27,7 @@ const artPieces: ArtPiece[] = [
     artist: "Rembrandt",
     name: "The Night Watch",
     imageSource: "https://example.com/the-night-watch.jpg",
+    colors: ["#2B2118", "#6B4E2E", "#A07C46"],
   },
 ];
 

@@ -2,6 +2,7 @@ import { useNavigate, useParams } from "react-router";
 
 import type { ArtPiece, ArtPieceInfo } from "../types";
 import { getComments, isFavorite } from "../utils/artPiecesInfo";
+import ColorPalette from "./ColorPalette";
 import CommentForm from "./CommentForm";
 import Comments from "./Comments";
 import FavoriteButton from "./FavoriteButton";
@@ -43,7 +44,7 @@ export default function ArtPieceDetails({
     );
   }
 
-  const { name, artist, imageSource, year, genre } = artPiece;
+  const { name, artist, imageSource, year, genre, colors } = artPiece;
 
   return (
     <section className="details">
@@ -62,6 +63,7 @@ export default function ArtPieceDetails({
         <dt>Genre</dt>
         <dd>{genre}</dd>
       </dl>
+      <ColorPalette colors={colors} />
       <Comments
         comments={getComments(artPiecesInfo, artPiece.slug)}
         onEditComment={(id, text) => onEditComment(artPiece.slug, id, text)}

@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router";
 
@@ -13,6 +13,7 @@ const artPieces: ArtPiece[] = [
     artist: "Vincent van Gogh",
     name: "Wheat Field with Cypresses",
     imageSource: "https://example.com/wheat-field.jpg",
+    colors: ["#37412E", "#8D7332", "#838665", "#718F98", "#9DA59E"],
   },
   {
     slug: "the-harvesters",
@@ -21,6 +22,7 @@ const artPieces: ArtPiece[] = [
     artist: "Pieter Bruegel the Elder",
     name: "The Harvesters",
     imageSource: "https://example.com/the-harvesters.jpg",
+    colors: ["#4D3C25", "#9A692E", "#7C8263", "#B78D53", "#C7B7A4"],
   },
 ];
 
@@ -202,4 +204,20 @@ test("the comment handlers receive the slug of this art piece", async () => {
     "the-harvesters",
     "1"
   );
+});
+
+test("shows the color palette of the art piece from the URL", () => {
+  renderDetails("/art-pieces/the-harvesters");
+
+  const palette = screen.getByRole("heading", { name: "Color palette" })
+    .nextElementSibling as HTMLElement;
+  const items = within(palette).getAllByRole("listitem");
+
+  expect(items).toHaveLength(5);
+  expect(
+    within(palette).getByRole("listitem", { name: "#4D3C25" })
+  ).toHaveStyle({ backgroundColor: "#4D3C25" });
+  expect(
+    within(palette).queryByRole("listitem", { name: "#37412E" })
+  ).not.toBeInTheDocument();
 });
