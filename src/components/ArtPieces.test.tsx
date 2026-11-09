@@ -27,7 +27,11 @@ test("shows every art piece in a list", () => {
   // the previews contain Links, which need a router
   render(
     <MemoryRouter>
-      <ArtPieces artPieces={artPieces} />
+      <ArtPieces
+        artPieces={artPieces}
+        artPiecesInfo={[]}
+        onToggleFavorite={vi.fn()}
+      />
     </MemoryRouter>
   );
 
@@ -39,4 +43,21 @@ test("shows every art piece in a list", () => {
   expect(
     screen.getByRole("heading", { name: "The Harvesters" })
   ).toBeInTheDocument();
+});
+
+test("shows a favorite button on each entry and highlights the favorites", () => {
+  render(
+    <MemoryRouter>
+      <ArtPieces
+        artPieces={artPieces}
+        artPiecesInfo={[{ slug: "the-harvesters", isFavorite: true }]}
+        onToggleFavorite={vi.fn()}
+      />
+    </MemoryRouter>
+  );
+
+  const buttons = screen.getAllByRole("button", { name: "Favorite" });
+  expect(buttons).toHaveLength(2);
+  expect(buttons[0]).toHaveAttribute("aria-pressed", "false");
+  expect(buttons[1]).toHaveAttribute("aria-pressed", "true");
 });

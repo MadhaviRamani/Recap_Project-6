@@ -175,3 +175,39 @@ test("clicking an art piece in the gallery shows its details", async () => {
   expect(screen.getByText("1565")).toBeInTheDocument();
   expect(screen.getByText("Genre Painting")).toBeInTheDocument();
 });
+
+test("clicking the favorite button marks and unmarks an art piece", async () => {
+  const user = userEvent.setup();
+  mockFetch({ ok: true, data: artPieces });
+
+  renderApp("/art-pieces");
+  const [firstButton] = await screen.findAllByRole("button", {
+    name: "Favorite",
+  });
+  expect(firstButton).toHaveAttribute("aria-pressed", "false");
+
+  await user.click(firstButton);
+  expect(firstButton).toHaveAttribute("aria-pressed", "true");
+
+  await user.click(firstButton);
+  expect(firstButton).toHaveAttribute("aria-pressed", "false");
+});
+
+test("the favorite status is shared between the pages", async () => {
+  const user = userEvent.setup();
+  mockFetch({ ok: true, data: artPieces });
+
+  renderApp("/art-pieces");
+  const buttons = await screen.findAllByRole("button", { name: "Favorite" });
+  // mark "The Harvesters" in the gallery, then open its details
+  await user.click(buttons[1]);
+  await user.click(screen.getByRole("link", { name: /The Harvesters/ }));
+
+  expect(
+    screen.getByRole("heading", { level: 1, name: "The Harvesters" })
+  ).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: "Favorite" })).toHaveAttribute(
+    "aria-pressed",
+    "true"
+  );
+});

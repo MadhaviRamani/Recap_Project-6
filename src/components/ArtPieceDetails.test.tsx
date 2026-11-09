@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router";
 
-import type { ArtPiece } from "../types";
+import type { ArtPiece, ArtPieceInfo } from "../types";
 import ArtPieceDetails from "./ArtPieceDetails";
 
 const artPieces: ArtPiece[] = [
@@ -25,14 +25,24 @@ const artPieces: ArtPiece[] = [
 ];
 
 // renders the details on their dynamic route, next to a stand-in list route
-function renderDetails(route: string) {
+function renderDetails(
+  route: string,
+  artPiecesInfo: ArtPieceInfo[] = [],
+  onToggleFavorite = vi.fn()
+) {
   render(
     <MemoryRouter initialEntries={[route]}>
       <Routes>
         <Route path="/art-pieces" element={<h1>Gallery list</h1>} />
         <Route
           path="/art-pieces/:slug"
-          element={<ArtPieceDetails artPieces={artPieces} />}
+          element={
+            <ArtPieceDetails
+              artPieces={artPieces}
+              artPiecesInfo={artPiecesInfo}
+              onToggleFavorite={onToggleFavorite}
+            />
+          }
         />
       </Routes>
     </MemoryRouter>
@@ -97,4 +107,25 @@ test("shows Art piece not found for an unknown slug", async () => {
   expect(
     screen.getByRole("heading", { name: "Gallery list" })
   ).toBeInTheDocument();
+});
+
+test("shows the favorite button with the favorite status", () => {
+  renderDetails("/art-pieces/the-harvesters", [
+    { slug: "the-harvesters", isFavorite: true },
+  ]);
+
+  expect(screen.getByRole("button", { name: "Favorite" })).toHaveAttribute(
+    "aria-pressed",
+    "true"
+  );
+});
+
+test("clicking the favorite button toggles the favorite of this art piece", async () => {
+  const user = userEvent.setup();
+  const onToggleFavorite = vi.fn();
+  renderDetails("/art-pieces/the-harvesters", [], onToggleFavorite);
+
+  await user.click(screen.getByRole("button", { name: "Favorite" }));
+
+  expect(onToggleFavorite).toHaveBeenCalledWith("the-harvesters");
 });
