@@ -2,6 +2,7 @@ import { Route, Routes } from "react-router";
 import useSWR from "swr";
 
 import ArtPieces from "./components/ArtPieces";
+import Spotlight from "./components/Spotlight";
 import type { ArtPiece } from "./types";
 import "./styles.css";
 
@@ -43,6 +44,15 @@ export default function App() {
   return (
     <main>
       <Routes>
+        <Route
+          path="/"
+          element={
+            <>
+              <h1>Spotlight</h1>
+              <Spotlight artPieces={artPieces} />
+            </>
+          }
+        />
         <Route
           path="/art-pieces"
           element={
