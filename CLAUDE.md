@@ -34,7 +34,7 @@ Art gallery app (Recap Project 6): four pages — Spotlight, Gallery, Favorites,
 - Type all props, state and fetched data.
 - Tests sit next to their component (`Navigation.test.tsx`). Wrap components containing `Link`/`NavLink` in `MemoryRouter`. Vitest file patterns must cover `.ts` and `.tsx` (`src/**/*.{ts,tsx}`).
 - Keep Vitest config in `vite.config.ts`; do not add a `vitest.config.ts` (it would override the jsdom/setupFiles config).
-- One feature branch and one PR per issue; merge only with green CI and quality gate.
+- One feature branch and one PR per issue; merge only with green CI and quality gate. Solve issues with `/solve-issue <number>` (`.claude/skills/solve-issue/SKILL.md`).
 
 ## Off limits
 
