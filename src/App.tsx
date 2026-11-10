@@ -96,7 +96,9 @@ export default function App() {
           path="/"
           element={
             <>
-              <h1>Spotlight</h1>
+              {/* hidden on screen, where the stage fills the page;
+                  screen readers still get the page heading */}
+              <h1 className="visually-hidden">Spotlight</h1>
               <Spotlight
                 artPieces={artPieces}
                 artPiecesInfo={artPiecesInfo}

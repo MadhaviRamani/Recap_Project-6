@@ -15,17 +15,32 @@
   --color-icon: #444;
   --color-favorite: #d6336c;
   --color-link: LinkText;
-  --color-nav-background: #222;
-  --color-nav-link: #ccc;
+  /* the navigation bar: warm bronze like the Spotlight stage */
+  --color-nav-background: #241d15;
+  --color-nav-link: #e8dfcf;
   --color-nav-active: white;
   --color-border: #0002;
   --color-shadow: #0002;
   --color-switch-off: #767676;
   --color-switch-on: #2f6f4e;
-  /* the gold accent of the navigation bar, which is dark in both themes */
-  --color-nav-gold: #c9a96e;
+  /* the gold accent of the navigation bar and the Spotlight stage,
+     which are dark in both themes */
+  --color-nav-gold: #dcc184;
   /* the fixed navigation bar at the top (styled in Navigation.css) */
   --navigation-height: 4rem;
+}
+
+/* hidden on screen but still read by screen readers */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* jumping to a part of the page does not hide it behind the navigation bar */
@@ -44,8 +59,8 @@ html {
   --color-icon: #e0e0e0;
   --color-favorite: #ff7aa5;
   --color-link: #8ab4f8;
-  --color-nav-background: #000;
-  --color-nav-link: #bdbdbd;
+  --color-nav-background: #1a150f;
+  --color-nav-link: #e8dfcf;
   --color-nav-active: white;
   --color-border: #fff3;
   --color-shadow: #0008;
@@ -128,103 +143,6 @@ main {
 .art-piece h2,
 .art-piece p {
   margin: 0.25rem 0 0;
-}
-
-.spotlight img {
-  height: 28rem;
-}
-
-/* the 3D box takes the place of the image while shuffling */
-.shuffle-scene {
-  --cube-size: 16rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 28rem;
-  perspective: 60rem;
-}
-
-.shuffle-cube {
-  position: relative;
-  width: var(--cube-size);
-  height: var(--cube-size);
-  transform-style: preserve-3d;
-  animation: shuffle-spin 3s linear;
-}
-
-.shuffle-cube-face {
-  position: absolute;
-  inset: 0;
-  backface-visibility: hidden;
-}
-
-.spotlight .shuffle-cube-face img {
-  width: 100%;
-  height: 100%;
-  border-radius: 0;
-}
-
-.shuffle-cube-face:nth-child(1) {
-  transform: rotateY(0deg) translateZ(calc(var(--cube-size) / 2));
-}
-
-.shuffle-cube-face:nth-child(2) {
-  transform: rotateY(90deg) translateZ(calc(var(--cube-size) / 2));
-}
-
-.shuffle-cube-face:nth-child(3) {
-  transform: rotateY(180deg) translateZ(calc(var(--cube-size) / 2));
-}
-
-.shuffle-cube-face:nth-child(4) {
-  transform: rotateY(-90deg) translateZ(calc(var(--cube-size) / 2));
-}
-
-.shuffle-cube-face:nth-child(5) {
-  transform: rotateX(90deg) translateZ(calc(var(--cube-size) / 2));
-}
-
-.shuffle-cube-face:nth-child(6) {
-  transform: rotateX(-90deg) translateZ(calc(var(--cube-size) / 2));
-}
-
-@keyframes shuffle-spin {
-  from {
-    transform: rotateX(0deg) rotateY(0deg);
-  }
-  to {
-    transform: rotateX(720deg) rotateY(1080deg);
-  }
-}
-
-@media (max-width: 40rem) {
-  .shuffle-scene {
-    --cube-size: 10rem;
-    height: 18rem;
-  }
-}
-
-/* fewer turns for people who prefer less motion */
-@media (prefers-reduced-motion: reduce) {
-  .shuffle-cube {
-    animation-name: shuffle-spin-reduced;
-  }
-}
-
-@keyframes shuffle-spin-reduced {
-  from {
-    transform: rotateY(0deg);
-  }
-  to {
-    transform: rotateY(360deg);
-  }
-}
-
-.spotlight-controls {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 0.75rem;
 }
 
 .favorite-button {
