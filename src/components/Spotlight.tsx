@@ -68,7 +68,7 @@ export default function Spotlight({
       </figure>
       <div className="spotlight-controls">
         <button type="button" onClick={showOtherArtPiece}>
-          {isPlaying ? "Shuffling" : "Shuffle"}
+          Shuffle
         </button>
         <button
           type="button"
