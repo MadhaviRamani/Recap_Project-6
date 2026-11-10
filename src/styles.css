@@ -75,6 +75,92 @@ nav a.active {
   height: 28rem;
 }
 
+/* the 3D box takes the place of the image while shuffling */
+.shuffle-scene {
+  --cube-size: 16rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 28rem;
+  perspective: 60rem;
+}
+
+.shuffle-cube {
+  position: relative;
+  width: var(--cube-size);
+  height: var(--cube-size);
+  transform-style: preserve-3d;
+  animation: shuffle-spin 3s linear;
+}
+
+.shuffle-cube-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+}
+
+.spotlight .shuffle-cube-face img {
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+}
+
+.shuffle-cube-face:nth-child(1) {
+  transform: rotateY(0deg) translateZ(calc(var(--cube-size) / 2));
+}
+
+.shuffle-cube-face:nth-child(2) {
+  transform: rotateY(90deg) translateZ(calc(var(--cube-size) / 2));
+}
+
+.shuffle-cube-face:nth-child(3) {
+  transform: rotateY(180deg) translateZ(calc(var(--cube-size) / 2));
+}
+
+.shuffle-cube-face:nth-child(4) {
+  transform: rotateY(-90deg) translateZ(calc(var(--cube-size) / 2));
+}
+
+.shuffle-cube-face:nth-child(5) {
+  transform: rotateX(90deg) translateZ(calc(var(--cube-size) / 2));
+}
+
+.shuffle-cube-face:nth-child(6) {
+  transform: rotateX(-90deg) translateZ(calc(var(--cube-size) / 2));
+}
+
+@keyframes shuffle-spin {
+  from {
+    transform: rotateX(0deg) rotateY(0deg);
+  }
+  to {
+    transform: rotateX(720deg) rotateY(1080deg);
+  }
+}
+
+@media (max-width: 40rem) {
+  .shuffle-scene {
+    --cube-size: 10rem;
+    height: 18rem;
+  }
+}
+
+/* fewer turns for people who prefer less motion */
+@media (prefers-reduced-motion: reduce) {
+  .shuffle-cube {
+    animation-name: shuffle-spin-reduced;
+  }
+}
+
+@keyframes shuffle-spin-reduced {
+  from {
+    transform: rotateY(0deg);
+  }
+  to {
+    transform: rotateY(360deg);
+  }
+}
+
 .spotlight-controls {
   display: flex;
   flex-wrap: wrap;
