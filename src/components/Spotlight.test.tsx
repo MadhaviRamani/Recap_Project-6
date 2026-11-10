@@ -1,8 +1,8 @@
-import { render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import type { ArtPiece } from "../types";
-import Spotlight from "./Spotlight";
+import Spotlight, { SLIDESHOW_INTERVAL_MS } from "./Spotlight";
 
 const artPieces: ArtPiece[] = [
   {
@@ -140,4 +140,145 @@ test("shows the favorite button and toggles the spotlighted art piece", async ()
 
   await user.click(button);
   expect(onToggleFavorite).toHaveBeenCalledWith("the-harvesters");
+});
+
+describe("shuffle and slideshow", () => {
+  const harvesters = "The Harvesters";
+  const wheatField = "Wheat Field with Cypresses";
+
+  function renderSpotlight() {
+    // starts with "The Harvesters"; with two art pieces, every change shows the other one
+    mockRandomValue(1);
+    return render(
+      <Spotlight
+        artPieces={artPieces}
+        artPiecesInfo={[]}
+        onToggleFavorite={vi.fn()}
+      />
+    );
+  }
+
+  function expectTitle(title: string) {
+    expect(screen.getByRole("heading", { name: title })).toBeInTheDocument();
+  }
+
+  function advanceSlideshow(times = 1) {
+    act(() => {
+      vi.advanceTimersByTime(SLIDESHOW_INTERVAL_MS * times);
+    });
+  }
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  test("shows Shuffle and Play buttons while paused", () => {
+    renderSpotlight();
+
+    expect(screen.getByRole("button", { name: "Shuffle" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Play" })).toBeInTheDocument();
+  });
+
+  test("clicking Shuffle shows another art piece", () => {
+    renderSpotlight();
+    expectTitle(harvesters);
+
+    fireEvent.click(screen.getByRole("button", { name: "Shuffle" }));
+    expectTitle(wheatField);
+
+    fireEvent.click(screen.getByRole("button", { name: "Shuffle" }));
+    expectTitle(harvesters);
+  });
+
+  test("does not change the art piece without Play", () => {
+    renderSpotlight();
+
+    advanceSlideshow(3);
+
+    expectTitle(harvesters);
+  });
+
+  test("Play changes the art piece every 3 seconds and shows Shuffling and Pause", () => {
+    renderSpotlight();
+
+    fireEvent.click(screen.getByRole("button", { name: "Play" }));
+    expect(
+      screen.getByRole("button", { name: "Shuffling" })
+    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Pause" })).toBeInTheDocument();
+
+    act(() => {
+      vi.advanceTimersByTime(SLIDESHOW_INTERVAL_MS - 1);
+    });
+    expectTitle(harvesters);
+
+    act(() => {
+      vi.advanceTimersByTime(1);
+    });
+    expectTitle(wheatField);
+
+    advanceSlideshow();
+    expectTitle(harvesters);
+  });
+
+  test("Pause keeps the current art piece and Play resumes", () => {
+    renderSpotlight();
+
+    fireEvent.click(screen.getByRole("button", { name: "Play" }));
+    advanceSlideshow();
+    expectTitle(wheatField);
+
+    fireEvent.click(screen.getByRole("button", { name: "Pause" }));
+    expect(screen.getByRole("button", { name: "Shuffle" })).toBeInTheDocument();
+    advanceSlideshow(5);
+    expectTitle(wheatField);
+
+    fireEvent.click(screen.getByRole("button", { name: "Play" }));
+    advanceSlideshow();
+    expectTitle(harvesters);
+  });
+
+  test("runs only one timer after pausing and playing again", () => {
+    renderSpotlight();
+
+    fireEvent.click(screen.getByRole("button", { name: "Play" }));
+    fireEvent.click(screen.getByRole("button", { name: "Pause" }));
+    expect(vi.getTimerCount()).toBe(0);
+
+    fireEvent.click(screen.getByRole("button", { name: "Play" }));
+    expect(vi.getTimerCount()).toBe(1);
+
+    advanceSlideshow();
+    expectTitle(wheatField);
+  });
+
+  test("stops the timer when the Spotlight is removed", () => {
+    const { unmount } = renderSpotlight();
+    fireEvent.click(screen.getByRole("button", { name: "Play" }));
+    expect(vi.getTimerCount()).toBe(1);
+
+    unmount();
+
+    expect(vi.getTimerCount()).toBe(0);
+  });
+});
+
+test("Shuffle keeps the only art piece when there is just one", () => {
+  render(
+    <Spotlight
+      artPieces={[artPieces[0]]}
+      artPiecesInfo={[]}
+      onToggleFavorite={vi.fn()}
+    />
+  );
+
+  fireEvent.click(screen.getByRole("button", { name: "Shuffle" }));
+
+  expect(
+    screen.getByRole("heading", { name: "Wheat Field with Cypresses" })
+  ).toBeInTheDocument();
 });
