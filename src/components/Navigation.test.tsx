@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 
 import Navigation from "./Navigation";
@@ -66,4 +66,16 @@ test("highlights only the Favorites link on /favorites", () => {
   expect(screen.getByRole("link", { name: "Gallery" })).not.toHaveClass(
     "active"
   );
+});
+
+test("shows exactly the three page links in the main navigation", () => {
+  renderNavigation("/");
+
+  const navigation = screen.getByRole("navigation", { name: "Main" });
+  const links = within(navigation).getAllByRole("link");
+  expect(links.map((link) => link.textContent)).toEqual([
+    "Spotlight",
+    "Gallery",
+    "Favorites",
+  ]);
 });

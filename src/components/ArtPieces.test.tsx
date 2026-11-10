@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
 
 import type { ArtPiece } from "../types";
@@ -64,4 +65,35 @@ test("shows a favorite button on each entry and highlights the favorites", () =>
   expect(buttons).toHaveLength(2);
   expect(buttons[0]).toHaveAttribute("aria-pressed", "false");
   expect(buttons[1]).toHaveAttribute("aria-pressed", "true");
+});
+
+test("shows an empty list when there are no art pieces", () => {
+  render(
+    <MemoryRouter>
+      <ArtPieces artPieces={[]} artPiecesInfo={[]} onToggleFavorite={vi.fn()} />
+    </MemoryRouter>
+  );
+
+  expect(screen.getByRole("list")).toBeInTheDocument();
+  expect(screen.queryAllByRole("listitem")).toHaveLength(0);
+});
+
+test("clicking a favorite button toggles the favorite of that art piece", async () => {
+  const user = userEvent.setup();
+  const handleToggleFavorite = vi.fn();
+  render(
+    <MemoryRouter>
+      <ArtPieces
+        artPieces={artPieces}
+        artPiecesInfo={[]}
+        onToggleFavorite={handleToggleFavorite}
+      />
+    </MemoryRouter>
+  );
+
+  const buttons = screen.getAllByRole("button", { name: "Favorite" });
+  await user.click(buttons[1]);
+
+  expect(handleToggleFavorite).toHaveBeenCalledTimes(1);
+  expect(handleToggleFavorite).toHaveBeenCalledWith("the-harvesters");
 });
