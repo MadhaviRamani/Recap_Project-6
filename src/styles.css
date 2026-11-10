@@ -22,6 +22,15 @@
   --color-shadow: #0002;
   --color-switch-off: #767676;
   --color-switch-on: #2f6f4e;
+  /* the gold accent of the navigation bar, which is dark in both themes */
+  --color-nav-gold: #c9a96e;
+  /* the fixed navigation bar at the top (styled in Navigation.css) */
+  --navigation-height: 4rem;
+}
+
+/* jumping to a part of the page does not hide it behind the navigation bar */
+html {
+  scroll-padding-top: var(--navigation-height);
 }
 
 /* set on <html> by App when dark mode is turned on;
@@ -59,30 +68,8 @@ a {
 main {
   max-width: 60rem;
   margin: 0 auto;
-  padding: 1rem 1rem 5rem;
-}
-
-nav {
-  position: fixed;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  display: flex;
-  justify-content: center;
-  gap: 1.5rem;
-  padding: 1rem;
-  background: var(--color-nav-background);
-  border-top: 1px solid var(--color-border);
-}
-
-nav a {
-  color: var(--color-nav-link);
-  text-decoration: none;
-}
-
-nav a.active {
-  color: var(--color-nav-active);
-  text-decoration: underline;
+  /* room for the fixed navigation bar at the top */
+  padding: calc(var(--navigation-height) + 1rem) 1rem 2rem;
 }
 
 .search-bar {
