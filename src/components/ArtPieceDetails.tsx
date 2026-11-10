@@ -63,7 +63,13 @@ export default function ArtPieceDetails({
         <dt>Genre</dt>
         <dd>{genre}</dd>
       </dl>
-      <ColorPalette colors={colors} />
+      {/* the key resets the palette when a similar art piece is opened */}
+      <ColorPalette
+        key={artPiece.slug}
+        colors={colors}
+        artPieces={artPieces}
+        currentSlug={artPiece.slug}
+      />
       <Comments
         comments={getComments(artPiecesInfo, artPiece.slug)}
         onEditComment={(id, text) => onEditComment(artPiece.slug, id, text)}

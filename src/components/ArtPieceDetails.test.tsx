@@ -215,9 +215,51 @@ test("shows the color palette of the art piece from the URL", () => {
 
   expect(items).toHaveLength(5);
   expect(
-    within(palette).getByRole("listitem", { name: "#4D3C25" })
+    within(palette)
+      .getByRole("button", { name: "Copy color #4D3C25" })
+      .closest("li")
   ).toHaveStyle({ backgroundColor: "#4D3C25" });
   expect(
-    within(palette).queryByRole("listitem", { name: "#37412E" })
+    within(palette).queryByRole("button", { name: "Copy color #37412E" })
+  ).not.toBeInTheDocument();
+});
+
+test("Similar in the palette finds other art pieces with a similar color", async () => {
+  const user = userEvent.setup();
+  renderDetails("/art-pieces/the-harvesters");
+
+  // #9A692E of The Harvesters is close to #8D7332 of the Wheat Field
+  await user.click(
+    screen.getByRole("button", {
+      name: "Find art pieces with a color similar to #9A692E",
+    })
+  );
+
+  expect(
+    screen.getByRole("link", { name: /Wheat Field with Cypresses/ })
+  ).toHaveAttribute("href", "/art-pieces/wheat-field-with-cypresses");
+});
+
+test("opening a similar art piece shows its own palette without old results", async () => {
+  const user = userEvent.setup();
+  renderDetails("/art-pieces/the-harvesters");
+  await user.click(
+    screen.getByRole("button", {
+      name: "Find art pieces with a color similar to #9A692E",
+    })
+  );
+
+  await user.click(
+    screen.getByRole("link", { name: /Wheat Field with Cypresses/ })
+  );
+
+  expect(
+    screen.getByRole("heading", { name: "Wheat Field with Cypresses" })
+  ).toBeInTheDocument();
+  expect(
+    screen.getByRole("button", { name: "Copy color #37412E" })
+  ).toBeInTheDocument();
+  expect(
+    screen.queryByRole("heading", { name: /Art pieces with a color similar/ })
   ).not.toBeInTheDocument();
 });
