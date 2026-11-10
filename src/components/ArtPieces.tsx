@@ -5,6 +5,7 @@ import { isFavorite } from "../utils/artPiecesInfo";
 import { getNationalities } from "../utils/artistNationality";
 import { searchArtPieces } from "../utils/searchArtPieces";
 import ArtPiecePreview from "./ArtPiecePreview";
+import Hallway from "./Hallway";
 import SearchBar from "./SearchBar";
 
 type ArtPiecesProps = {
@@ -52,9 +53,16 @@ export default function ArtPieces({
           )}
         </>
       )}
-      {isFiltered && shownArtPieces.length === 0 ? (
-        <p>No art pieces found</p>
-      ) : (
+      {isFiltered && shownArtPieces.length === 0 && <p>No art pieces found</p>}
+      {/* the gallery hangs in a 3D hallway, the favorites stay a list */}
+      {isSearchable && shownArtPieces.length > 0 && (
+        <Hallway
+          artPieces={shownArtPieces}
+          artPiecesInfo={artPiecesInfo}
+          onToggleFavorite={onToggleFavorite}
+        />
+      )}
+      {!isSearchable && (
         <ul className="art-list">
           {shownArtPieces.map((artPiece) => (
             <li key={artPiece.slug}>
