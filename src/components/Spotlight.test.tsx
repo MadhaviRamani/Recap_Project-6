@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import type { ArtPiece } from "../types";
@@ -229,7 +229,8 @@ describe("shuffle and slideshow", () => {
         name: "The Harvesters by Pieter Bruegel the Elder",
       })
     ).not.toBeInTheDocument();
-    expectTitle(harvesters);
+    // no details during the spin; they come back with the picked art piece
+    expect(screen.queryByRole("heading")).not.toBeInTheDocument();
   });
 
   test("spins for 3 seconds, then shows the picked art piece and Shuffle again", () => {
@@ -242,11 +243,12 @@ describe("shuffle and slideshow", () => {
     expect(
       screen.getByRole("button", { name: "Shuffling" })
     ).toBeInTheDocument();
-    expectTitle(harvesters);
+    expect(screen.queryByRole("heading")).not.toBeInTheDocument();
 
     act(() => {
       vi.advanceTimersByTime(1);
     });
+    expectTitle(wheatField);
     expect(
       screen.queryByRole("img", { name: "Shuffling art pieces" })
     ).not.toBeInTheDocument();
@@ -387,4 +389,112 @@ test("Shuffle keeps the only art piece when there is just one", () => {
   expect(
     screen.getByRole("heading", { name: "Wheat Field with Cypresses" })
   ).toBeInTheDocument();
+});
+
+describe("spotlight stage", () => {
+  function renderStage() {
+    // starts with "Wheat Field with Cypresses"
+    mockRandomValue(0);
+    return render(
+      <Spotlight
+        artPieces={artPieces}
+        artPiecesInfo={[]}
+        onToggleFavorite={vi.fn()}
+      />
+    );
+  }
+
+  test("shows the image inside the golden frame and its mat", () => {
+    renderStage();
+
+    const image = screen.getByRole("img", {
+      name: "Wheat Field with Cypresses by Vincent van Gogh",
+    });
+    const mat = image.closest(".spotlight-mat");
+    expect(mat).toBeInTheDocument();
+    expect(mat?.closest(".spotlight-frame")).toBeInTheDocument();
+  });
+
+  test("shows the name and the artist in the details of the light circle", () => {
+    renderStage();
+
+    const details = screen
+      .getByRole("heading", { name: "Wheat Field with Cypresses" })
+      .closest("figcaption");
+    expect(details).toHaveClass("spotlight-details");
+    expect(
+      within(details as HTMLElement).getByText("Vincent van Gogh")
+    ).toBeInTheDocument();
+  });
+
+  test("hides the spotlight beam and the light circle from screen readers", () => {
+    const { container } = renderStage();
+
+    expect(container.querySelector(".spotlight-beam")).toHaveAttribute(
+      "aria-hidden",
+      "true"
+    );
+    expect(container.querySelector(".spotlight-light-circle")).toHaveAttribute(
+      "aria-hidden",
+      "true"
+    );
+  });
+
+  test("shows the spinning box plain, without the golden frame, while shuffling", () => {
+    vi.useFakeTimers();
+    const { container } = renderStage();
+
+    fireEvent.click(screen.getByRole("button", { name: "Shuffle" }));
+
+    expect(
+      screen.getByRole("img", { name: "Shuffling art pieces" })
+    ).toBeInTheDocument();
+    expect(container.querySelector(".spotlight-frame")).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Favorite" })
+    ).not.toBeInTheDocument();
+    expect(screen.queryByText("Vincent van Gogh")).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("heading", { name: "Wheat Field with Cypresses" })
+    ).not.toBeInTheDocument();
+    vi.useRealTimers();
+  });
+
+  test("shows the favorite button again after the spin", () => {
+    vi.useFakeTimers();
+    renderStage();
+
+    fireEvent.click(screen.getByRole("button", { name: "Shuffle" }));
+    act(() => {
+      vi.advanceTimersByTime(SHUFFLE_DURATION_MS);
+    });
+
+    expect(
+      screen.getByRole("button", { name: "Favorite" })
+    ).toBeInTheDocument();
+    vi.useRealTimers();
+  });
+
+  test("updates the name and the artist together with the image", () => {
+    vi.useFakeTimers();
+    renderStage();
+
+    fireEvent.click(screen.getByRole("button", { name: "Shuffle" }));
+    act(() => {
+      vi.advanceTimersByTime(SHUFFLE_DURATION_MS);
+    });
+
+    const details = screen
+      .getByRole("heading", { name: "The Harvesters" })
+      .closest("figcaption") as HTMLElement;
+    expect(
+      within(details).getByText("Pieter Bruegel the Elder")
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("img", {
+        name: "The Harvesters by Pieter Bruegel the Elder",
+      })
+    ).toBeInTheDocument();
+    vi.useRealTimers();
+  });
 });

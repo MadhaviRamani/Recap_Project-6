@@ -1,6 +1,7 @@
-/* the navigation bar, fixed at the top of every page: a deep, softly lit
-   bar with a fine gold line, floating over the page on a soft shadow;
-   the colors come from the theme custom properties in styles.css */
+/* the navigation bar, fixed at the top of every page: warm bronze smoky
+   glass like the Spotlight stage, lit from above, with a fine gold line,
+   floating over the page on a soft shadow; the colors come from the theme
+   custom properties in styles.css */
 .navigation {
   position: fixed;
   top: 0;
@@ -8,10 +9,12 @@
   left: 0;
   z-index: 10;
   height: var(--navigation-height);
+  /* nearly opaque, so the text stays readable over light page content */
   background: linear-gradient(
-    color-mix(in srgb, var(--color-nav-background), white 7%),
-    var(--color-nav-background)
+    rgb(78 62 42 / 0.92),
+    color-mix(in srgb, var(--color-nav-background) 94%, transparent)
   );
+  backdrop-filter: blur(12px) saturate(140%);
   border-bottom: 1px solid
     color-mix(in srgb, var(--color-nav-gold), transparent 45%);
   box-shadow:
@@ -214,5 +217,12 @@
   .navigation-links a {
     font-size: 0.6875rem;
     letter-spacing: 0.04em;
+  }
+}
+
+/* without frosted glass support, the bar is solid bronze */
+@supports not (backdrop-filter: blur(1px)) {
+  .navigation {
+    background: linear-gradient(#4e3e2a, var(--color-nav-background));
   }
 }
