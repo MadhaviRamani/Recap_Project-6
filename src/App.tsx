@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Route, Routes } from "react-router";
 import useSWR from "swr";
 
@@ -14,6 +14,10 @@ import {
   isFavorite,
   toggleFavorite,
 } from "./utils/artPiecesInfo";
+import {
+  loadArtPiecesInfo,
+  saveArtPiecesInfo,
+} from "./utils/artPiecesInfoStorage";
 import "./styles.css";
 
 const API_URL = "https://example-apis.vercel.app/api/art";
@@ -35,7 +39,13 @@ export default function App() {
     fetcher
   );
   // own information (favorites, comments), shared by all routes; the fetched art pieces stay unchanged
-  const [artPiecesInfo, setArtPiecesInfo] = useState<ArtPieceInfo[]>([]);
+  // read from the local storage once, when the state is created
+  const [artPiecesInfo, setArtPiecesInfo] =
+    useState<ArtPieceInfo[]>(loadArtPiecesInfo);
+
+  useEffect(() => {
+    saveArtPiecesInfo(artPiecesInfo);
+  }, [artPiecesInfo]);
 
   function handleToggleFavorite(slug: string) {
     setArtPiecesInfo((currentInfo) => toggleFavorite(currentInfo, slug));

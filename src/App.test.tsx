@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
 import { SWRConfig } from "swr";
@@ -295,4 +295,38 @@ test("a comment can be added, edited and deleted on one art piece only", async (
   expect(screen.getByText("Golden fields!")).toBeInTheDocument();
   await user.click(screen.getByRole("button", { name: "Delete" }));
   expect(screen.getByText("No comments yet.")).toBeInTheDocument();
+});
+
+test("favorites and comments are kept after a reload", async () => {
+  const user = userEvent.setup();
+  mockFetch({ ok: true, data: artPieces });
+
+  renderApp("/art-pieces/the-harvesters");
+  await user.click(await screen.findByRole("button", { name: "Favorite" }));
+  await user.type(screen.getByLabelText("Add comment"), "Golden fields");
+  await user.click(screen.getByRole("button", { name: "Send" }));
+
+  // a reload starts the app again with a fresh state
+  cleanup();
+  renderApp("/art-pieces/the-harvesters");
+
+  expect(
+    await screen.findByRole("button", { name: "Favorite" })
+  ).toHaveAttribute("aria-pressed", "true");
+  expect(screen.getByText("Golden fields")).toBeInTheDocument();
+});
+
+test("starts with the favorites saved in the local storage", async () => {
+  localStorage.setItem(
+    "art-pieces-info",
+    JSON.stringify([{ slug: "the-harvesters", isFavorite: true, comments: [] }])
+  );
+  mockFetch({ ok: true, data: artPieces });
+
+  renderApp("/favorites");
+
+  expect(await screen.findAllByRole("listitem")).toHaveLength(1);
+  expect(
+    screen.getByRole("heading", { name: "The Harvesters" })
+  ).toBeInTheDocument();
 });
