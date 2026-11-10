@@ -92,15 +92,47 @@ test("highlights only the Profile link on /profile", () => {
   );
 });
 
-test("shows exactly the four page links in the main navigation", () => {
+test("shows exactly the logo and the four page links in the main navigation", () => {
   renderNavigation("/");
 
   const navigation = screen.getByRole("navigation", { name: "Main" });
   const links = within(navigation).getAllByRole("link");
-  expect(links.map((link) => link.textContent)).toEqual([
+  // the logo and Profile are named by their aria-label, the others by their text
+  expect(
+    links.map((link) => link.getAttribute("aria-label") ?? link.textContent)
+  ).toEqual([
+    "Art Gallery – Spotlight",
     "Spotlight",
     "Gallery",
     "Favorites",
     "Profile",
   ]);
+});
+
+test("shows an M / R square logo with Art Gallery under it that links to /", () => {
+  renderNavigation("/art-pieces");
+
+  const logo = screen.getByRole("link", { name: "Art Gallery – Spotlight" });
+  expect(logo).toHaveAttribute("href", "/");
+  const square = logo.querySelector("svg");
+  expect(square).toHaveAttribute("aria-hidden", "true");
+  expect(square).toHaveTextContent("MR");
+  expect(logo.lastElementChild).toHaveTextContent("Art Gallery");
+});
+
+test("does not highlight the logo, only the Spotlight link, on /", () => {
+  renderNavigation("/");
+
+  expect(
+    screen.getByRole("link", { name: "Art Gallery – Spotlight" })
+  ).not.toHaveClass("active");
+  expect(screen.getByRole("link", { name: "Spotlight" })).toHaveClass("active");
+});
+
+test("shows Profile only as a user icon without visible text", () => {
+  renderNavigation("/");
+
+  const profile = screen.getByRole("link", { name: "Profile" });
+  expect(profile.textContent).toBe("");
+  expect(profile.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
 });

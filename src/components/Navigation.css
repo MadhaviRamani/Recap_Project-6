@@ -1,0 +1,218 @@
+/* the navigation bar, fixed at the top of every page: a deep, softly lit
+   bar with a fine gold line, floating over the page on a soft shadow;
+   the colors come from the theme custom properties in styles.css */
+.navigation {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 10;
+  height: var(--navigation-height);
+  background: linear-gradient(
+    color-mix(in srgb, var(--color-nav-background), white 7%),
+    var(--color-nav-background)
+  );
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--color-nav-gold), transparent 45%);
+  box-shadow:
+    inset 0 1px 0 #ffffff14,
+    0 0.75rem 1.75rem -0.75rem #000a;
+}
+
+/* the content of the bar lines up with the 60rem wide page content */
+.navigation-inner {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 60rem;
+  height: 100%;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.navigation a {
+  color: var(--color-nav-link);
+  text-decoration: none;
+}
+
+.navigation a:focus-visible {
+  outline: 1px solid var(--color-nav-gold);
+  outline-offset: 4px;
+}
+
+/* the logo: a gold-framed "M / R" monogram with "Art Gallery" under it */
+.navigation-logo {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  gap: 0.1875rem;
+  align-items: center;
+  perspective: 12rem;
+}
+
+.navigation .navigation-logo {
+  color: var(--color-nav-active);
+}
+
+/* a soft shadow lifts the square a little off the bar */
+.navigation-logo-mark {
+  width: 2.25rem;
+  height: 2.25rem;
+  filter: drop-shadow(0 2px 3px #000a);
+  transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.navigation-logo-frame {
+  fill: none;
+  stroke: var(--color-nav-gold);
+}
+
+.navigation-logo-letter {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 13px;
+  fill: currentColor;
+  text-anchor: middle;
+}
+
+.navigation-logo-text {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 0.5625rem;
+  line-height: 1;
+  letter-spacing: 0.32em;
+  /* the letter spacing also follows the last letter; this keeps it centered */
+  margin-right: -0.32em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--color-nav-gold);
+}
+
+/* the square turns gently in 3D on hover and keyboard focus */
+.navigation-logo:hover .navigation-logo-mark,
+.navigation-logo:focus-visible .navigation-logo-mark {
+  transform: rotateY(-18deg) rotateX(6deg);
+}
+
+.navigation-links {
+  display: flex;
+  gap: 1.75rem;
+  align-items: center;
+}
+
+/* small capitals with wide spacing; a fine gold line grows from the center
+   on hover and stays under the current page */
+.navigation-links a {
+  position: relative;
+  padding: 0.375rem 0;
+  font-size: 0.75rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  transition: color 0.3s ease;
+}
+
+.navigation-links a::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 1px;
+  background: var(--color-nav-gold);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.navigation-links a:hover {
+  color: var(--color-nav-active);
+}
+
+.navigation-links a:hover::after,
+.navigation-links a.active::after {
+  transform: scaleX(1);
+}
+
+.navigation-links a.active {
+  color: var(--color-nav-gold);
+}
+
+/* the Profile link shows only a user icon, in a fine gold ring */
+.navigation .navigation-profile {
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--color-nav-gold), transparent 50%);
+  border-radius: 50%;
+  transition:
+    color 0.3s ease,
+    background 0.3s ease,
+    border-color 0.3s ease;
+}
+
+.navigation .navigation-profile svg {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+.navigation .navigation-profile::after {
+  content: none;
+}
+
+.navigation .navigation-profile:hover {
+  border-color: var(--color-nav-gold);
+}
+
+/* the current page: a filled gold ring */
+.navigation .navigation-profile.active {
+  color: var(--color-nav-background);
+  background: var(--color-nav-gold);
+  border-color: var(--color-nav-gold);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navigation-logo-mark,
+  .navigation-links a,
+  .navigation-links a::after,
+  .navigation .navigation-profile {
+    transition: none;
+  }
+
+  .navigation-logo:hover .navigation-logo-mark,
+  .navigation-logo:focus-visible .navigation-logo-mark {
+    transform: none;
+  }
+}
+
+/* on small screens only the square of the logo is shown
+   and the links move closer */
+@media (max-width: 30rem) {
+  .navigation-logo-text {
+    display: none;
+  }
+
+  .navigation-links {
+    gap: 0.875rem;
+  }
+
+  .navigation-links a {
+    letter-spacing: 0.08em;
+  }
+}
+
+/* very narrow phones (320px): smaller text, so the bar never scrolls sideways */
+@media (max-width: 23rem) {
+  .navigation-inner {
+    gap: 0.5rem;
+    padding: 0 0.75rem;
+  }
+
+  .navigation-links {
+    gap: 0.625rem;
+  }
+
+  .navigation-links a {
+    font-size: 0.6875rem;
+    letter-spacing: 0.04em;
+  }
+}

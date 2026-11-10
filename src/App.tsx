@@ -172,9 +172,10 @@ export default function App() {
 
   return (
     <>
-      <main>{content}</main>
-      {/* rendered once, outside the routes, so it appears on every page */}
+      {/* rendered once, outside the routes, so it appears on every page;
+          before main, so keyboard and screen readers reach it first like on screen */}
       <Navigation />
+      <main>{content}</main>
     </>
   );
 }
