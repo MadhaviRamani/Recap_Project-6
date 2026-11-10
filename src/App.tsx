@@ -46,10 +46,21 @@ export default function App() {
     useState<ArtPieceInfo[]>(loadArtPiecesInfo);
 
   const [profileName, setProfileName] = useState<string>(DEFAULT_PROFILE_NAME);
+  // the app starts in the light theme
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
 
   useEffect(() => {
     saveArtPiecesInfo(artPiecesInfo);
   }, [artPiecesInfo]);
+
+  // the theme is set on <html>, so it applies to the whole app, also the navigation
+  useEffect(() => {
+    document.documentElement.dataset.theme = isDarkMode ? "dark" : "light";
+  }, [isDarkMode]);
+
+  function handleToggleDarkMode() {
+    setIsDarkMode((current) => !current);
+  }
 
   function handleToggleFavorite(slug: string) {
     setArtPiecesInfo((currentInfo) => toggleFavorite(currentInfo, slug));
@@ -146,6 +157,8 @@ export default function App() {
                 artPieces={artPieces}
                 artPiecesInfo={artPiecesInfo}
                 onChangeProfileName={setProfileName}
+                isDarkMode={isDarkMode}
+                onToggleDarkMode={handleToggleDarkMode}
               />
             </>
           }

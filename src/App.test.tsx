@@ -323,6 +323,44 @@ test("the Profile page shows the loading state while the art pieces are fetched"
   expect(await screen.findByText("Art pieces: 2")).toBeInTheDocument();
 });
 
+test("the app starts in the light theme", async () => {
+  mockFetch({ ok: true, data: artPieces });
+
+  renderApp("/profile");
+
+  expect(document.documentElement).toHaveAttribute("data-theme", "light");
+  expect(
+    await screen.findByRole("switch", { name: "Dark mode" })
+  ).toHaveAttribute("aria-checked", "false");
+});
+
+test("the Dark mode switch changes the theme of the whole app", async () => {
+  const user = userEvent.setup();
+  mockFetch({ ok: true, data: artPieces });
+
+  renderApp("/profile");
+  await user.click(await screen.findByRole("switch", { name: "Dark mode" }));
+
+  expect(document.documentElement).toHaveAttribute("data-theme", "dark");
+  expect(screen.getByRole("switch", { name: "Dark mode" })).toHaveAttribute(
+    "aria-checked",
+    "true"
+  );
+
+  // the theme stays when navigating between pages
+  await user.click(screen.getByRole("link", { name: "Gallery" }));
+  expect(document.documentElement).toHaveAttribute("data-theme", "dark");
+  await user.click(screen.getByRole("link", { name: "Profile" }));
+  expect(screen.getByRole("switch", { name: "Dark mode" })).toHaveAttribute(
+    "aria-checked",
+    "true"
+  );
+
+  // turning it off goes back to the light theme
+  await user.click(screen.getByRole("switch", { name: "Dark mode" }));
+  expect(document.documentElement).toHaveAttribute("data-theme", "light");
+});
+
 test("a comment can be added, edited and deleted on one art piece only", async () => {
   const user = userEvent.setup();
   mockFetch({ ok: true, data: artPieces });
