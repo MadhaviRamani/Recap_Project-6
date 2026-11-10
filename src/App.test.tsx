@@ -267,6 +267,62 @@ test("the Favorites page shows an empty list without favorites", async () => {
   expect(screen.queryAllByRole("listitem")).toHaveLength(0);
 });
 
+test("the Profile page shows the counts and updates the favorites count", async () => {
+  const user = userEvent.setup();
+  mockFetch({ ok: true, data: artPieces });
+
+  renderApp("/profile");
+
+  expect(
+    await screen.findByRole("heading", { level: 1, name: "Profile" })
+  ).toBeInTheDocument();
+  expect(
+    screen.getByRole("heading", { name: "Art Lover" })
+  ).toBeInTheDocument();
+  expect(screen.getByText("Art pieces: 2")).toBeInTheDocument();
+  expect(screen.getByText("Favorites: 0")).toBeInTheDocument();
+
+  // mark "The Harvesters" in the gallery, then go back to the Profile page
+  await user.click(screen.getByRole("link", { name: "Gallery" }));
+  const buttons = screen.getAllByRole("button", { name: "Favorite" });
+  await user.click(buttons[1]);
+  await user.click(screen.getByRole("link", { name: "Profile" }));
+  expect(screen.getByText("Favorites: 1")).toBeInTheDocument();
+
+  // unmarking it lowers the count again
+  await user.click(screen.getByRole("link", { name: "Favorites" }));
+  await user.click(screen.getByRole("button", { name: "Favorite" }));
+  await user.click(screen.getByRole("link", { name: "Profile" }));
+  expect(screen.getByText("Favorites: 0")).toBeInTheDocument();
+});
+
+test("the profile name can be changed and stays when changing pages", async () => {
+  const user = userEvent.setup();
+  mockFetch({ ok: true, data: artPieces });
+
+  renderApp("/profile");
+  await user.click(await screen.findByRole("button", { name: "Edit name" }));
+  const input = screen.getByLabelText("Profile name");
+  await user.clear(input);
+  await user.type(input, "Ada");
+  await user.click(screen.getByRole("button", { name: "Save" }));
+
+  expect(screen.getByRole("heading", { name: "Ada" })).toBeInTheDocument();
+
+  await user.click(screen.getByRole("link", { name: "Gallery" }));
+  await user.click(screen.getByRole("link", { name: "Profile" }));
+  expect(screen.getByRole("heading", { name: "Ada" })).toBeInTheDocument();
+});
+
+test("the Profile page shows the loading state while the art pieces are fetched", async () => {
+  mockFetch({ ok: true, data: artPieces });
+
+  renderApp("/profile");
+
+  expect(screen.getByText("Loading…")).toBeInTheDocument();
+  expect(await screen.findByText("Art pieces: 2")).toBeInTheDocument();
+});
+
 test("a comment can be added, edited and deleted on one art piece only", async () => {
   const user = userEvent.setup();
   mockFetch({ ok: true, data: artPieces });

@@ -68,7 +68,31 @@ test("highlights only the Favorites link on /favorites", () => {
   );
 });
 
-test("shows exactly the three page links in the main navigation", () => {
+test("shows a link labeled Profile to /profile", () => {
+  renderNavigation("/");
+
+  expect(screen.getByRole("link", { name: "Profile" })).toHaveAttribute(
+    "href",
+    "/profile"
+  );
+});
+
+test("highlights only the Profile link on /profile", () => {
+  renderNavigation("/profile");
+
+  expect(screen.getByRole("link", { name: "Profile" })).toHaveClass("active");
+  expect(screen.getByRole("link", { name: "Spotlight" })).not.toHaveClass(
+    "active"
+  );
+  expect(screen.getByRole("link", { name: "Gallery" })).not.toHaveClass(
+    "active"
+  );
+  expect(screen.getByRole("link", { name: "Favorites" })).not.toHaveClass(
+    "active"
+  );
+});
+
+test("shows exactly the four page links in the main navigation", () => {
   renderNavigation("/");
 
   const navigation = screen.getByRole("navigation", { name: "Main" });
@@ -77,5 +101,6 @@ test("shows exactly the three page links in the main navigation", () => {
     "Spotlight",
     "Gallery",
     "Favorites",
+    "Profile",
   ]);
 });

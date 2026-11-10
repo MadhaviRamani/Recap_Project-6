@@ -9,6 +9,7 @@ export default function Navigation() {
       </NavLink>
       <NavLink to="/art-pieces">Gallery</NavLink>
       <NavLink to="/favorites">Favorites</NavLink>
+      <NavLink to="/profile">Profile</NavLink>
     </nav>
   );
 }

@@ -5,6 +5,7 @@ import useSWR from "swr";
 import ArtPieceDetails from "./components/ArtPieceDetails";
 import ArtPieces from "./components/ArtPieces";
 import Navigation from "./components/Navigation";
+import Profile from "./components/Profile";
 import Spotlight from "./components/Spotlight";
 import type { ArtPiece, ArtPieceInfo } from "./types";
 import {
@@ -21,6 +22,7 @@ import {
 import "./styles.css";
 
 const API_URL = "https://example-apis.vercel.app/api/art";
+const DEFAULT_PROFILE_NAME = "Art Lover";
 
 export async function fetcher(url: string): Promise<ArtPiece[]> {
   const response = await fetch(url);
@@ -42,6 +44,8 @@ export default function App() {
   // read from the local storage once, when the state is created
   const [artPiecesInfo, setArtPiecesInfo] =
     useState<ArtPieceInfo[]>(loadArtPiecesInfo);
+
+  const [profileName, setProfileName] = useState<string>(DEFAULT_PROFILE_NAME);
 
   useEffect(() => {
     saveArtPiecesInfo(artPiecesInfo);
@@ -128,6 +132,20 @@ export default function App() {
                 )}
                 artPiecesInfo={artPiecesInfo}
                 onToggleFavorite={handleToggleFavorite}
+              />
+            </>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <>
+              <h1>Profile</h1>
+              <Profile
+                profileName={profileName}
+                artPieces={artPieces}
+                artPiecesInfo={artPiecesInfo}
+                onChangeProfileName={setProfileName}
               />
             </>
           }
