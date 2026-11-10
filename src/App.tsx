@@ -99,6 +99,7 @@ export default function App() {
                 artPieces={artPieces}
                 artPiecesInfo={artPiecesInfo}
                 onToggleFavorite={handleToggleFavorite}
+                isSearchable
               />
             </>
           }

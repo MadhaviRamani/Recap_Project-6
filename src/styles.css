@@ -40,6 +40,33 @@ nav a.active {
   text-decoration: underline;
 }
 
+.search-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.search-bar input {
+  flex: 1 1 12rem;
+  min-width: 0;
+  padding: 0.5rem;
+  font: inherit;
+}
+
+.search-bar select {
+  max-width: 100%;
+  padding: 0.5rem;
+  font: inherit;
+}
+
+.search-status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
 .art-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
