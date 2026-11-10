@@ -97,3 +97,155 @@ test("clicking a favorite button toggles the favorite of that art piece", async 
   expect(handleToggleFavorite).toHaveBeenCalledTimes(1);
   expect(handleToggleFavorite).toHaveBeenCalledWith("the-harvesters");
 });
+
+describe("search", () => {
+  function renderSearchableArtPieces() {
+    render(
+      <MemoryRouter>
+        <ArtPieces
+          artPieces={artPieces}
+          artPiecesInfo={[]}
+          onToggleFavorite={vi.fn()}
+          isSearchable
+        />
+      </MemoryRouter>
+    );
+    return userEvent.setup();
+  }
+
+  async function search(
+    user: ReturnType<typeof userEvent.setup>,
+    text: string
+  ) {
+    await user.type(
+      screen.getByRole("searchbox", { name: "Search art pieces" }),
+      text
+    );
+    await user.click(screen.getByRole("button", { name: "Search" }));
+  }
+
+  test("shows no search bar unless it is searchable", () => {
+    render(
+      <MemoryRouter>
+        <ArtPieces
+          artPieces={artPieces}
+          artPiecesInfo={[]}
+          onToggleFavorite={vi.fn()}
+        />
+      </MemoryRouter>
+    );
+
+    expect(screen.queryByRole("search")).not.toBeInTheDocument();
+  });
+
+  test("shows only the art pieces matching the search", async () => {
+    const user = renderSearchableArtPieces();
+
+    await search(user, "van gogh");
+
+    expect(screen.getAllByRole("listitem")).toHaveLength(1);
+    expect(
+      screen.getByRole("heading", { name: "Wheat Field with Cypresses" })
+    ).toBeInTheDocument();
+    expect(screen.getByText(/Results for “van gogh”/)).toBeInTheDocument();
+    expect(
+      screen.getByRole("searchbox", { name: "Search art pieces" })
+    ).toHaveValue("");
+  });
+
+  test("Show all shows every art piece again", async () => {
+    const user = renderSearchableArtPieces();
+    await search(user, "Harvesters");
+    expect(screen.getAllByRole("listitem")).toHaveLength(1);
+
+    await user.click(screen.getByRole("button", { name: "Show all" }));
+
+    expect(screen.getAllByRole("listitem")).toHaveLength(2);
+    expect(screen.queryByText(/Results for/)).not.toBeInTheDocument();
+  });
+
+  test("shows a message when no art piece matches", async () => {
+    const user = renderSearchableArtPieces();
+
+    await search(user, "sculpture");
+
+    expect(screen.getByText("No art pieces found")).toBeInTheDocument();
+    expect(screen.queryByRole("list")).not.toBeInTheDocument();
+  });
+
+  test("an empty search shows all art pieces", async () => {
+    const user = renderSearchableArtPieces();
+
+    await user.click(screen.getByRole("button", { name: "Search" }));
+
+    expect(screen.getAllByRole("listitem")).toHaveLength(2);
+    expect(screen.queryByText(/Results for/)).not.toBeInTheDocument();
+  });
+});
+
+describe("nationality dropdown", () => {
+  test("lists the nationalities of the art pieces and filters by the chosen one", async () => {
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter>
+        <ArtPieces
+          artPieces={artPieces}
+          artPiecesInfo={[]}
+          onToggleFavorite={vi.fn()}
+          isSearchable
+        />
+      </MemoryRouter>
+    );
+    const dropdown = screen.getByRole("combobox", { name: "Nationality" });
+    expect(
+      screen.getAllByRole("option").map((option) => option.textContent)
+    ).toEqual(["All nationalities", "Dutch", "Flemish"]);
+
+    await user.selectOptions(dropdown, "Flemish");
+    // nothing changes before Search is clicked
+    expect(screen.getAllByRole("listitem")).toHaveLength(2);
+
+    await user.click(screen.getByRole("button", { name: "Search" }));
+
+    expect(screen.getAllByRole("listitem")).toHaveLength(1);
+    expect(
+      screen.getByRole("heading", { name: "The Harvesters" })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Results from Flemish artists/)
+    ).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Show all" }));
+
+    expect(screen.getAllByRole("listitem")).toHaveLength(2);
+    expect(screen.queryByText(/Results/)).not.toBeInTheDocument();
+  });
+
+  test("combines the dropdown with the search text", async () => {
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter>
+        <ArtPieces
+          artPieces={artPieces}
+          artPiecesInfo={[]}
+          onToggleFavorite={vi.fn()}
+          isSearchable
+        />
+      </MemoryRouter>
+    );
+
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: "Nationality" }),
+      "Dutch"
+    );
+    await user.type(
+      screen.getByRole("searchbox", { name: "Search art pieces" }),
+      "harvesters{Enter}"
+    );
+
+    expect(
+      screen.getByText(/Results for “harvesters” from Dutch artists/)
+    ).toBeInTheDocument();
+    expect(screen.getByText("No art pieces found")).toBeInTheDocument();
+  });
+});
