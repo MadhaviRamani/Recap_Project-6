@@ -76,6 +76,14 @@ test("keeps spaces inside the search text and ignores them around it", () => {
   expect(searchArtPieces(artPieces, "thecard")).toEqual([]);
 });
 
+test("counts several spaces, tabs and non-breaking spaces as one space", () => {
+  expect(searchArtPieces(artPieces, "van  gogh")).toEqual([wheatField]);
+  expect(searchArtPieces(artPieces, "the   card\tplayers")).toEqual([
+    cardPlayers,
+  ]);
+  expect(searchArtPieces(artPieces, "great\u00A0wave")).toEqual([greatWave]);
+});
+
 test("ignores accents", () => {
   expect(searchArtPieces(artPieces, "cezanne")).toEqual([cardPlayers]);
   expect(searchArtPieces(artPieces, "Cézanne")).toEqual([cardPlayers]);

@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import SearchBar from "./SearchBar";
@@ -55,4 +55,80 @@ test("pressing Enter also searches, with all nationalities by default", async ()
   );
 
   expect(onSearch).toHaveBeenCalledWith("VAN GOGH", "");
+});
+
+describe("Search button", () => {
+  function getSearchButton() {
+    return screen.getByRole("button", { name: "Search" });
+  }
+
+  test("is disabled while there is nothing to search", () => {
+    renderSearchBar();
+
+    expect(getSearchButton()).toBeDisabled();
+  });
+
+  test("stays disabled with only spaces, and Enter does not search", async () => {
+    const onSearch = vi.fn();
+    const user = renderSearchBar(onSearch);
+    const input = screen.getByRole("searchbox", { name: "Search art pieces" });
+
+    await user.type(input, "   ");
+    expect(getSearchButton()).toBeDisabled();
+
+    await user.type(input, "{Enter}");
+    await user.click(getSearchButton());
+
+    expect(onSearch).not.toHaveBeenCalled();
+    expect(input).toHaveValue("   ");
+  });
+
+  test("is enabled with a letter in the search field", async () => {
+    const user = renderSearchBar();
+
+    await user.type(
+      screen.getByRole("searchbox", { name: "Search art pieces" }),
+      " a"
+    );
+
+    expect(getSearchButton()).toBeEnabled();
+  });
+
+  test("is enabled with a chosen nationality and an empty field", async () => {
+    const onSearch = vi.fn();
+    const user = renderSearchBar(onSearch);
+
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: "Nationality" }),
+      "Dutch"
+    );
+    expect(getSearchButton()).toBeEnabled();
+    await user.click(getSearchButton());
+
+    expect(onSearch).toHaveBeenCalledWith("", "Dutch");
+  });
+
+  test("passes the text without extra spaces and is disabled again after the search", async () => {
+    const onSearch = vi.fn();
+    const user = renderSearchBar(onSearch);
+
+    await user.type(
+      screen.getByRole("searchbox", { name: "Search art pieces" }),
+      "  great \t  wave "
+    );
+    await user.click(getSearchButton());
+
+    expect(onSearch).toHaveBeenCalledWith("great wave", "");
+    expect(getSearchButton()).toBeDisabled();
+  });
+
+  test("a form submitted without anything to search does not search", () => {
+    const onSearch = vi.fn();
+    renderSearchBar(onSearch);
+
+    // e.g. submitted by a script; the disabled button blocks Enter and clicks
+    fireEvent.submit(screen.getByRole("search"));
+
+    expect(onSearch).not.toHaveBeenCalled();
+  });
 });

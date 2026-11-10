@@ -1,9 +1,11 @@
 import type { ArtPiece } from "../types";
 import { getArtistNationality } from "./artistNationality";
+import { cleanSearchText } from "./cleanSearchText";
 
-// lowercase without accents, so "VAN GOGH" finds "van gogh" and "cezanne" finds "Cézanne"
+// lowercase without accents and extra spaces, so "VAN GOGH" finds "van gogh",
+// "cezanne" finds "Cézanne" and "van  gogh" finds "van gogh"
 function normalize(text: string): string {
-  return text
+  return cleanSearchText(text)
     .normalize("NFD")
     .replace(/\p{Diacritic}/gu, "")
     .toLowerCase();
@@ -17,7 +19,7 @@ export function searchArtPieces(
   query: string,
   nationality = ""
 ): ArtPiece[] {
-  const searchText = normalize(query.trim());
+  const searchText = normalize(query);
 
   return artPieces.filter(({ name, artist, genre }) => {
     if (nationality !== "" && getArtistNationality(artist) !== nationality) {

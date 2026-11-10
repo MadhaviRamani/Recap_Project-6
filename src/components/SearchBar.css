@@ -80,7 +80,7 @@
   border-radius: 999px;
 }
 
-.search-bar button:hover {
+.search-bar button:hover:not(:disabled) {
   box-shadow: 0 0 1rem rgb(248 226 182 / 0.45);
 }
 
@@ -126,4 +126,12 @@
   .search-bar select {
     background: var(--color-search-solid);
   }
+}
+
+/* without a search text or a nationality there is nothing to search:
+   the Search button is dimmed, does not glow and shows it cannot be used */
+.search-bar button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  filter: saturate(0.4);
 }

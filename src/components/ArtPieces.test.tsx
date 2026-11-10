@@ -258,6 +258,18 @@ describe("search", () => {
     expect(screen.queryByRole("list")).not.toBeInTheDocument();
   });
 
+  test("ignores extra spaces between the words", async () => {
+    const user = renderSearchableArtPieces();
+
+    await search(user, "van   gogh");
+
+    expect(screen.getAllByRole("listitem")).toHaveLength(1);
+    expect(
+      screen.getByRole("heading", { name: "Wheat Field with Cypresses" })
+    ).toBeInTheDocument();
+    expect(screen.getByText(/Results for “van gogh”/)).toBeInTheDocument();
+  });
+
   test("an empty search shows all art pieces", async () => {
     const user = renderSearchableArtPieces();
 

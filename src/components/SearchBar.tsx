@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
 
+import { cleanSearchText } from "../utils/cleanSearchText";
 import "./SearchBar.css";
 
 type SearchBarProps = {
@@ -11,10 +12,16 @@ type SearchBarProps = {
 export default function SearchBar({ nationalities, onSearch }: SearchBarProps) {
   const [query, setQuery] = useState("");
   const [nationality, setNationality] = useState("");
+  const searchText = cleanSearchText(query);
+  // there is only something to search with a text or a chosen nationality
+  const canSearch = searchText !== "" || nationality !== "";
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    onSearch(query.trim(), nationality);
+    if (!canSearch) {
+      return;
+    }
+    onSearch(searchText, nationality);
     // the fields are cleared after each search; the list shows what was searched for
     setQuery("");
     setNationality("");
@@ -41,7 +48,9 @@ export default function SearchBar({ nationalities, onSearch }: SearchBarProps) {
           </option>
         ))}
       </select>
-      <button type="submit">Search</button>
+      <button type="submit" disabled={!canSearch}>
+        Search
+      </button>
     </form>
   );
 }
