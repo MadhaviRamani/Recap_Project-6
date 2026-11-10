@@ -28,6 +28,22 @@
   --color-nav-gold: #dcc184;
   /* the fixed navigation bar at the top (styled in Navigation.css) */
   --navigation-height: 4rem;
+  /* the search bar on the runway of the gallery hallway (SearchBar.css):
+     light, frosted ivory glass with dark text; the fields and the search
+     status are less see-through, so their text stays readable (at least
+     4.5:1 over the floor, the runner and its gold edges) */
+  --color-search-background: rgb(255 250 240 / 0.35);
+  --color-search-field: rgb(255 253 248 / 0.8);
+  --color-search-status: rgb(255 250 240 / 0.75);
+  /* without frosted glass support */
+  --color-search-solid: #fffdf8;
+  /* the light the glass catches at its top edge */
+  --color-search-sheen: rgb(255 255 255 / 0.55);
+  --color-search-text: #2b2118;
+  --color-search-placeholder: #6b5a45;
+  --color-search-border: #a8843f;
+  /* the carpet runner down the middle of the hallway floor */
+  --color-runway: #7a2430;
 }
 
 /* hidden on screen but still read by screen readers */
@@ -66,6 +82,17 @@ html {
   --color-shadow: #0008;
   --color-switch-off: #8a8a85;
   --color-switch-on: #4caf7d;
+  /* smoky, dark frosted glass with ivory text */
+  --color-search-background: rgb(18 15 11 / 0.3);
+  --color-search-field: rgb(31 25 18 / 0.7);
+  --color-search-status: rgb(18 15 11 / 0.68);
+  --color-search-solid: #1f1912;
+  --color-search-sheen: rgb(255 244 214 / 0.22);
+  --color-search-text: #f5efe2;
+  --color-search-placeholder: #c9bba3;
+  --color-search-border: #dcc184;
+  /* a deep dark-red runner */
+  --color-runway: #4a1219;
 }
 
 body {
@@ -85,33 +112,6 @@ main {
   margin: 0 auto;
   /* room for the fixed navigation bar at the top */
   padding: calc(var(--navigation-height) + 1rem) 1rem 2rem;
-}
-
-.search-bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  align-items: center;
-}
-
-.search-bar input {
-  flex: 1 1 12rem;
-  min-width: 0;
-  padding: 0.5rem;
-  font: inherit;
-}
-
-.search-bar select {
-  max-width: 100%;
-  padding: 0.5rem;
-  font: inherit;
-}
-
-.search-status {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  align-items: center;
 }
 
 .art-list {

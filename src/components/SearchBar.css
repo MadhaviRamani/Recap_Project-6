@@ -1,0 +1,129 @@
+/* the search bar lies on the runway of the gallery hallway: a pane of
+   frosted glass with a fine gold edge, light in the light theme and smoky
+   dark in the dark theme (colors in styles.css); the runner and the floor
+   shine through it, blurred; the dropdown list follows the theme through the
+   color-scheme of the page */
+.search-bar,
+.search-status {
+  color: var(--color-search-text);
+  /* a soft sheen across the glass, brightest at the top left */
+  background:
+    linear-gradient(
+      135deg,
+      var(--color-search-sheen),
+      transparent 45%,
+      transparent 70%,
+      rgb(255 255 255 / 0.08)
+    ),
+    var(--color-search-background);
+  border: 1px solid var(--color-search-border);
+  border-radius: 0.75rem;
+  backdrop-filter: blur(18px) saturate(160%);
+  box-shadow:
+    /* the bright top edge and the darker bottom edge of the glass */
+    inset 0 1px 0 var(--color-search-sheen),
+    inset 0 -1px 0 rgb(0 0 0 / 0.15),
+    0 1rem 2rem rgb(0 0 0 / 0.45);
+}
+
+.search-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.625rem;
+}
+
+.search-bar input,
+.search-bar select {
+  min-width: 0;
+  padding: 0.5rem 0.75rem;
+  font: inherit;
+  color: var(--color-search-text);
+  background: var(--color-search-field);
+  border: 1px solid var(--color-search-border);
+  border-radius: 0.5rem;
+  /* the fields are set into the glass */
+  box-shadow: inset 0 1px 3px rgb(0 0 0 / 0.18);
+}
+
+.search-bar input {
+  flex: 1 1 12rem;
+}
+
+.search-bar select {
+  max-width: 100%;
+}
+
+.search-bar input::placeholder {
+  color: var(--color-search-placeholder);
+  opacity: 1;
+}
+
+/* the Search button in gold, like the buttons of the Spotlight stage */
+.search-bar button {
+  padding: 0.5rem 1.25rem;
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #241d15;
+  cursor: pointer;
+  background: linear-gradient(
+    145deg,
+    #f1e2b8,
+    var(--color-nav-gold) 45%,
+    #c9a862
+  );
+  border: 1px solid #a8843f;
+  border-radius: 999px;
+}
+
+.search-bar button:hover {
+  box-shadow: 0 0 1rem rgb(248 226 182 / 0.45);
+}
+
+/* "Results for …" and "No art pieces found" on a small panel right above
+   the search bar */
+.search-status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  margin: 0;
+  padding: 0.375rem 0.875rem;
+  /* less see-through than the search bar: its text lies on the glass */
+  background-color: var(--color-search-status);
+}
+
+.search-status button {
+  padding: 0.125rem 0.75rem;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  background: none;
+  border: 1px solid var(--color-search-border);
+  border-radius: 999px;
+}
+
+/* the focus ring in the text color: dark on the light panel, ivory on the
+   dark panel */
+.search-bar :focus-visible,
+.search-status :focus-visible {
+  outline: 2px solid var(--color-search-text);
+  outline-offset: 2px;
+}
+
+/* without frosted glass support, the panels get a solid color instead */
+@supports not (backdrop-filter: blur(1px)) {
+  .search-bar,
+  .search-status {
+    background: var(--color-search-solid);
+  }
+
+  .search-bar input,
+  .search-bar select {
+    background: var(--color-search-solid);
+  }
+}

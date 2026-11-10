@@ -337,3 +337,35 @@ describe("front view", () => {
     });
   });
 });
+
+describe("runway", () => {
+  test("shows its content in the hallway, before the art pieces", async () => {
+    const user = userEvent.setup();
+    const { container } = render(
+      <MemoryRouter>
+        <Hallway
+          artPieces={createArtPieces(2)}
+          artPiecesInfo={[]}
+          onToggleFavorite={vi.fn()}
+          runway={<button type="button">On the runway</button>}
+        />
+      </MemoryRouter>
+    );
+
+    const runwayButton = screen.getByRole("button", { name: "On the runway" });
+    expect(container.querySelector(".hallway-runway")).toContainElement(
+      runwayButton
+    );
+
+    // the keyboard reaches the runway first
+    await user.tab();
+    expect(runwayButton).toHaveFocus();
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
+  test("has no runway without content", () => {
+    const { container } = renderHallway(createArtPieces(2));
+
+    expect(container.querySelector(".hallway-runway")).not.toBeInTheDocument();
+  });
+});
