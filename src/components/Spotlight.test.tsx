@@ -2,7 +2,10 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import type { ArtPiece } from "../types";
-import Spotlight, { SLIDESHOW_INTERVAL_MS } from "./Spotlight";
+import Spotlight, {
+  SHUFFLE_DURATION_MS,
+  SLIDESHOW_INTERVAL_MS,
+} from "./Spotlight";
 
 const artPieces: ArtPiece[] = [
   {
@@ -183,14 +186,114 @@ describe("shuffle and slideshow", () => {
     expect(screen.getByRole("button", { name: "Play" })).toBeInTheDocument();
   });
 
-  test("clicking Shuffle shows another art piece", () => {
+  function finishShuffle() {
+    act(() => {
+      vi.advanceTimersByTime(SHUFFLE_DURATION_MS);
+    });
+  }
+
+  test("clicking Shuffle shows another art piece after the spin", () => {
     renderSpotlight();
     expectTitle(harvesters);
 
     fireEvent.click(screen.getByRole("button", { name: "Shuffle" }));
+    finishShuffle();
     expectTitle(wheatField);
 
     fireEvent.click(screen.getByRole("button", { name: "Shuffle" }));
+    finishShuffle();
+    expectTitle(harvesters);
+  });
+
+  test("clicking Shuffle shows the spinning box with art piece images and Shuffling", () => {
+    const { container } = renderSpotlight();
+
+    fireEvent.click(screen.getByRole("button", { name: "Shuffle" }));
+
+    expect(
+      screen.getByRole("img", { name: "Shuffling art pieces" })
+    ).toBeInTheDocument();
+    const faceImages = container.querySelectorAll(".shuffle-cube-face img");
+    expect(faceImages).toHaveLength(6);
+    expect(faceImages[0]).toHaveAttribute(
+      "src",
+      "https://example.com/wheat-field.jpg"
+    );
+    expect(faceImages[1]).toHaveAttribute(
+      "src",
+      "https://example.com/the-harvesters.jpg"
+    );
+    expect(screen.getByRole("button", { name: "Shuffling" })).toBeDisabled();
+    expect(
+      screen.queryByRole("img", {
+        name: "The Harvesters by Pieter Bruegel the Elder",
+      })
+    ).not.toBeInTheDocument();
+    expectTitle(harvesters);
+  });
+
+  test("spins for 3 seconds, then shows the picked art piece and Shuffle again", () => {
+    renderSpotlight();
+
+    fireEvent.click(screen.getByRole("button", { name: "Shuffle" }));
+    act(() => {
+      vi.advanceTimersByTime(SHUFFLE_DURATION_MS - 1);
+    });
+    expect(
+      screen.getByRole("button", { name: "Shuffling" })
+    ).toBeInTheDocument();
+    expectTitle(harvesters);
+
+    act(() => {
+      vi.advanceTimersByTime(1);
+    });
+    expect(
+      screen.queryByRole("img", { name: "Shuffling art pieces" })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("img", {
+        name: "Wheat Field with Cypresses by Vincent van Gogh",
+      })
+    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Shuffle" })).toBeEnabled();
+  });
+
+  test("clicking Shuffle during a spin starts no second spin", () => {
+    renderSpotlight();
+
+    fireEvent.click(screen.getByRole("button", { name: "Shuffle" }));
+    fireEvent.click(screen.getByRole("button", { name: "Shuffling" }));
+    expect(vi.getTimerCount()).toBe(1);
+
+    finishShuffle();
+    expectTitle(wheatField);
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
+  test("stops the shuffle timer when the Spotlight is removed during a spin", () => {
+    const { unmount } = renderSpotlight();
+    fireEvent.click(screen.getByRole("button", { name: "Shuffle" }));
+    expect(vi.getTimerCount()).toBe(1);
+
+    unmount();
+
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
+  test("the slideshow waits during a spin and continues afterwards", () => {
+    renderSpotlight();
+
+    fireEvent.click(screen.getByRole("button", { name: "Play" }));
+    fireEvent.click(screen.getByRole("button", { name: "Shuffle" }));
+    // only the shuffle timer runs during the spin
+    expect(vi.getTimerCount()).toBe(1);
+
+    finishShuffle();
+    expectTitle(wheatField);
+    expect(screen.getByRole("button", { name: "Pause" })).toBeInTheDocument();
+    expect(vi.getTimerCount()).toBe(1);
+
+    advanceSlideshow();
     expectTitle(harvesters);
   });
 
@@ -266,6 +369,7 @@ describe("shuffle and slideshow", () => {
 });
 
 test("Shuffle keeps the only art piece when there is just one", () => {
+  vi.useFakeTimers();
   render(
     <Spotlight
       artPieces={[artPieces[0]]}
@@ -275,6 +379,10 @@ test("Shuffle keeps the only art piece when there is just one", () => {
   );
 
   fireEvent.click(screen.getByRole("button", { name: "Shuffle" }));
+  act(() => {
+    vi.advanceTimersByTime(SHUFFLE_DURATION_MS);
+  });
+  vi.useRealTimers();
 
   expect(
     screen.getByRole("heading", { name: "Wheat Field with Cypresses" })
