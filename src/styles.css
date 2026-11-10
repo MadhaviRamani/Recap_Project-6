@@ -227,16 +227,107 @@ nav a.active {
 
 .palette {
   display: flex;
-  gap: 0.5rem;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  /* room for a circle growing on hover */
+  padding: 1.5rem;
+  list-style: none;
+}
+
+/* the color circle holds the copy button with the code and the Similar button;
+   it is drawn at its big size and scaled down to the normal 2.5rem circle,
+   the negative margin keeps its place in the row at 2.5rem */
+.palette-swatch {
+  --swatch-size: 5.5rem;
+  --swatch-small: 2.5rem;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  width: var(--swatch-size);
+  height: var(--swatch-size);
+  margin: calc((var(--swatch-small) - var(--swatch-size)) / 2);
+  border-radius: 50%;
+  border: 1px solid #0003;
+  transform: scale(calc(2.5 / 5.5));
+  transition:
+    transform 0.2s,
+    margin 0.2s;
+}
+
+/* grows over its neighbours on hover, keyboard focus and while "Copied" shows */
+.palette-swatch:hover,
+.palette-swatch:focus-within,
+.palette-swatch.copied {
+  z-index: 1;
+  /* takes its full width in the row, so the neighbours move aside
+     instead of being covered */
+  margin-inline: 0;
+  transform: scale(1);
+  box-shadow: 0 0.25rem 0.75rem #0004;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .palette-swatch {
+    transition: none;
+  }
+}
+
+.palette-code,
+.palette-similar {
+  padding: 0.125rem 0.375rem;
+  border: none;
+  border-radius: 0.25rem;
+  font: inherit;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  color: white;
+  background: #000b;
+  cursor: pointer;
+  /* hidden until the circle is hovered or a button in it has keyboard focus */
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.palette-swatch:hover :is(.palette-code, .palette-similar),
+.palette-swatch:focus-within :is(.palette-code, .palette-similar),
+.palette-swatch.copied .palette-code {
+  opacity: 1;
+}
+
+.palette-code:hover,
+.palette-similar:hover {
+  background: #000;
+}
+
+/* marks the circle whose similar art pieces are shown;
+   thick because the outline is scaled down with the small circle */
+.palette-swatch:has(.palette-similar[aria-pressed="true"]) {
+  outline: 6px solid #222;
+  outline-offset: 4px;
+}
+
+.similar-art {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(8rem, 1fr));
+  gap: 0.75rem;
   padding: 0;
   list-style: none;
 }
 
-.palette li {
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 50%;
-  border: 1px solid #0003;
+.similar-art a {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+.details .similar-art img {
+  width: 100%;
+  height: 6rem;
+  object-fit: cover;
+  border-radius: 0.25rem;
 }
 
 .comments {
