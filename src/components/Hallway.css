@@ -1,14 +1,26 @@
-/* the Gallery page is wider than the other pages, so the hallway has room */
+/* on the Gallery page the hallway fills the whole page from edge to edge,
+   under the navigation bar and the search bar, down to the bottom of the
+   screen, without page scrolling */
 main:has(.hallway) {
-  max-width: 90rem;
+  display: flex;
+  flex-direction: column;
+  max-width: none;
+  height: 100dvh;
+  padding: calc(var(--navigation-height) + 1rem) 0 0;
+}
+
+/* the search bar and the search status keep a margin to the screen edges */
+main:has(.hallway) > :not(.hallway) {
+  width: calc(100% - 2rem);
+  max-width: 60rem;
+  margin-inline: auto;
 }
 
 /* the gallery as a 3D hallway: the viewer stands at its open end and looks
    down the hallway to the front wall; it is a dark, warmly lit hallway in
    both themes, so the lamps always show */
 .hallway {
-  /* the size of the hallway: its height and how far it runs back */
-  --hallway-height: 36rem;
+  /* how far the hallway runs back */
   --hallway-depth: 120rem;
   /* the warm light of the lamps */
   --lamp-light: 248 226 182;
@@ -22,15 +34,15 @@ main:has(.hallway) {
   --wall-near: #4a3a28;
   --wall-far: #21190f;
   position: relative;
-  height: var(--hallway-height);
-  margin-top: 1.5rem;
+  /* takes all the height left under the search bar */
+  flex: 1 1 auto;
+  min-height: 30rem;
+  margin-top: 1rem;
   overflow: hidden;
   color: var(--ivory);
   background: var(--wall-far);
-  border-radius: 0.25rem;
   perspective: 48rem;
   perspective-origin: 50% 45%;
-  box-shadow: 0 1rem 2.5rem var(--color-shadow);
 }
 
 /* the room holds the walls, the floor and the ceiling in one 3D space */
@@ -347,8 +359,12 @@ main:has(.hallway) {
 /* small screens: no 3D, the hallway turns into one flat wall
    with the art pieces stacked, each with its frame, lamp and shadow */
 @media (max-width: 48rem) {
-  .hallway {
+  main:has(.hallway) {
     height: auto;
+  }
+
+  .hallway {
+    min-height: 0;
     padding: 1.5rem 0.5rem 2rem;
     background: linear-gradient(var(--wall-near), #2d2317);
     perspective: none;

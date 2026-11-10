@@ -111,7 +111,9 @@ export default function App() {
           path="/art-pieces"
           element={
             <>
-              <h1>Gallery</h1>
+              {/* hidden on screen, where the hallway fills the page;
+                  screen readers still get the page heading */}
+              <h1 className="visually-hidden">Gallery</h1>
               <ArtPieces
                 artPieces={artPieces}
                 artPiecesInfo={artPiecesInfo}
