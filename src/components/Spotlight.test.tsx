@@ -202,13 +202,11 @@ describe("shuffle and slideshow", () => {
     expectTitle(harvesters);
   });
 
-  test("Play changes the art piece every 3 seconds and shows Shuffling and Pause", () => {
+  test("Play changes the art piece every 3 seconds and shows Pause while Shuffle stays", () => {
     renderSpotlight();
 
     fireEvent.click(screen.getByRole("button", { name: "Play" }));
-    expect(
-      screen.getByRole("button", { name: "Shuffling" })
-    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Shuffle" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Pause" })).toBeInTheDocument();
 
     act(() => {
