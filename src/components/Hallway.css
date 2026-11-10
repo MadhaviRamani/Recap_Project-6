@@ -1,19 +1,12 @@
 /* on the Gallery page the hallway fills the whole page from edge to edge,
-   under the navigation bar and the search bar, down to the bottom of the
-   screen, without page scrolling */
+   under the navigation bar down to the bottom of the screen, without page
+   scrolling; the search bar lies on its runway */
 main:has(.hallway) {
   display: flex;
   flex-direction: column;
   max-width: none;
   height: 100dvh;
-  padding: calc(var(--navigation-height) + 1rem) 0 0;
-}
-
-/* the search bar and the search status keep a margin to the screen edges */
-main:has(.hallway) > :not(.hallway) {
-  width: calc(100% - 2rem);
-  max-width: 60rem;
-  margin-inline: auto;
+  padding: var(--navigation-height) 0 0;
 }
 
 /* the gallery as a 3D hallway: the viewer stands at its open end and looks
@@ -34,10 +27,9 @@ main:has(.hallway) > :not(.hallway) {
   --wall-near: #4a3a28;
   --wall-far: #21190f;
   position: relative;
-  /* takes all the height left under the search bar */
+  /* takes all the height under the navigation bar */
   flex: 1 1 auto;
   min-height: 30rem;
-  margin-top: 1rem;
   overflow: hidden;
   color: var(--ivory);
   background: var(--wall-far);
@@ -106,7 +98,9 @@ main:has(.hallway) > :not(.hallway) {
     #2d2317;
 }
 
-/* the floor: dark polished wooden planks that lead to the front wall */
+/* the floor: dark polished wooden planks that lead to the front wall, with
+   a carpet runner down the middle, edged with a fine gold line on each side;
+   the runner color follows the theme */
 .hallway-floor {
   bottom: 0;
   left: 0;
@@ -116,6 +110,26 @@ main:has(.hallway) > :not(.hallway) {
   transform: rotateX(90deg);
   background:
     linear-gradient(to top, transparent, rgb(0 0 0 / 0.55)),
+    /* the soft sheen of the carpet, light in the middle */
+    linear-gradient(
+        90deg,
+        transparent 34%,
+        rgb(255 255 255 / 0.06) 50%,
+        transparent 66%
+      ),
+    /* the runner with its gold edges */
+    linear-gradient(
+        90deg,
+        transparent 33%,
+        var(--frame-gold) 33% 33.5%,
+        var(--color-runway) 33.5% 34.5%,
+        var(--frame-gold-light) 34.5% 34.7%,
+        var(--color-runway) 34.7% 65.3%,
+        var(--frame-gold-light) 65.3% 65.5%,
+        var(--color-runway) 65.5% 66.5%,
+        var(--frame-gold) 66.5% 67%,
+        transparent 67%
+      ),
     repeating-linear-gradient(
       90deg,
       #3a2a1a 0 5.5rem,
@@ -143,6 +157,31 @@ main:has(.hallway) > :not(.hallway) {
     ),
     linear-gradient(#1b140d, #120d08);
   pointer-events: none;
+}
+
+/* the near end of the runway holds the search bar and the search status,
+   flat and readable at the bottom middle of the hallway; only its panels
+   take the mouse, so the art pieces around it stay clickable */
+.hallway-runway {
+  position: absolute;
+  bottom: 1.5rem;
+  left: 50%;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+  width: min(44rem, calc(100% - 2rem));
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.hallway-runway > * {
+  pointer-events: auto;
+}
+
+.hallway-runway > .search-bar {
+  align-self: stretch;
 }
 
 /* the art pieces on a wall hang in a row at eye level */
@@ -373,6 +412,14 @@ main:has(.hallway) > :not(.hallway) {
   .hallway-room {
     position: static;
     transform-style: flat;
+  }
+
+  /* the search lies at the top of the flat wall, full width */
+  .hallway-runway {
+    position: static;
+    width: auto;
+    margin-bottom: 2rem;
+    transform: none;
   }
 
   .hallway-floor,

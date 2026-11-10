@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
 
@@ -113,6 +113,56 @@ describe("hallway", () => {
 
     expect(screen.getByRole("list", { name: "Left wall" })).toBeInTheDocument();
     expect(screen.getAllByRole("listitem")).toHaveLength(2);
+  });
+
+  test("the search bar lies in the hallway", () => {
+    const { container } = render(
+      <MemoryRouter>
+        <ArtPieces
+          artPieces={artPieces}
+          artPiecesInfo={[]}
+          onToggleFavorite={vi.fn()}
+          isSearchable
+        />
+      </MemoryRouter>
+    );
+
+    expect(container.querySelector(".hallway-runway")).toContainElement(
+      screen.getByRole("search")
+    );
+  });
+
+  test("the hallway and its search bar stay when nothing matches", async () => {
+    const user = userEvent.setup();
+    const { container } = render(
+      <MemoryRouter>
+        <ArtPieces
+          artPieces={artPieces}
+          artPiecesInfo={[]}
+          onToggleFavorite={vi.fn()}
+          isSearchable
+        />
+      </MemoryRouter>
+    );
+
+    await user.type(
+      screen.getByRole("searchbox", { name: "Search art pieces" }),
+      "sculpture{Enter}"
+    );
+
+    const runway = container.querySelector(".hallway-runway");
+    expect(runway).toContainElement(screen.getByText("No art pieces found"));
+    expect(runway).toContainElement(screen.getByRole("search"));
+    // the walls are empty
+    expect(screen.queryAllByRole("listitem")).toHaveLength(0);
+
+    await user.click(screen.getByRole("button", { name: "Show all" }));
+
+    expect(
+      within(screen.getByRole("list", { name: "Left wall" })).getAllByRole(
+        "listitem"
+      )
+    ).toHaveLength(2);
   });
 
   test("the favorites list is not a hallway", () => {

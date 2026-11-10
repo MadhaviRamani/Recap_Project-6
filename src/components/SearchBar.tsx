@@ -1,5 +1,7 @@
 import { useState, type FormEvent } from "react";
 
+import "./SearchBar.css";
+
 type SearchBarProps = {
   nationalities: string[];
   // nationality "" stands for all nationalities

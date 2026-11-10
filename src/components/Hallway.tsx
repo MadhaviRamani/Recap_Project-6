@@ -6,6 +6,7 @@ import {
   type HTMLAttributes,
   type KeyboardEvent,
   type PointerEvent,
+  type ReactNode,
 } from "react";
 
 import type { ArtPiece, ArtPieceInfo } from "../types";
@@ -88,7 +89,11 @@ export default function Hallway({
   artPieces,
   artPiecesInfo,
   onToggleFavorite,
-}: HallwayProps) {
+  runway,
+}: HallwayProps & {
+  // shown flat on the near end of the runway, e.g. the search bar
+  runway?: ReactNode;
+}) {
   const [activeSlug, setActiveSlug] = useState<string | null>(null);
   const closeTimer = useRef<number | undefined>(undefined);
   // a press with the mouse or a finger also focuses the link; only focus
@@ -240,6 +245,9 @@ export default function Hallway({
 
   return (
     <div className="hallway" ref={hallwayRef} onBlur={handleBlur}>
+      {/* outside the 3D room, so it stays flat and readable; first in the
+          page, so the keyboard reaches it before the art pieces */}
+      {runway && <div className="hallway-runway">{runway}</div>}
       <div className="hallway-room">
         <div className="hallway-ceiling" aria-hidden="true" />
         <div className="hallway-floor" aria-hidden="true" />

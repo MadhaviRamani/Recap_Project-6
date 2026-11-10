@@ -33,48 +33,51 @@ export default function ArtPieces({
     setNationality(chosenNationality);
   }
 
+  // the gallery hangs in a 3D hallway, with the search on its runway;
+  // the hallway stays when nothing matches, so the search bar stays, too
+  if (isSearchable) {
+    return (
+      <Hallway
+        artPieces={shownArtPieces}
+        artPiecesInfo={artPiecesInfo}
+        onToggleFavorite={onToggleFavorite}
+        runway={
+          <>
+            {isFiltered && (
+              <p className="search-status">
+                Results
+                {searchQuery !== "" && <> for &ldquo;{searchQuery}&rdquo;</>}
+                {nationality !== "" && <> from {nationality} artists</>}{" "}
+                <button type="button" onClick={() => search("", "")}>
+                  Show all
+                </button>
+              </p>
+            )}
+            {isFiltered && shownArtPieces.length === 0 && (
+              <p className="search-status">No art pieces found</p>
+            )}
+            <SearchBar
+              nationalities={getNationalities(artPieces)}
+              onSearch={search}
+            />
+          </>
+        }
+      />
+    );
+  }
+
+  // the favorites stay a list; they cannot be searched
   return (
-    <>
-      {isSearchable && (
-        <>
-          <SearchBar
-            nationalities={getNationalities(artPieces)}
-            onSearch={search}
+    <ul className="art-list">
+      {shownArtPieces.map((artPiece) => (
+        <li key={artPiece.slug}>
+          <ArtPiecePreview
+            artPiece={artPiece}
+            isFavorite={isFavorite(artPiecesInfo, artPiece.slug)}
+            onToggleFavorite={onToggleFavorite}
           />
-          {isFiltered && (
-            <p className="search-status">
-              Results
-              {searchQuery !== "" && <> for &ldquo;{searchQuery}&rdquo;</>}
-              {nationality !== "" && <> from {nationality} artists</>}{" "}
-              <button type="button" onClick={() => search("", "")}>
-                Show all
-              </button>
-            </p>
-          )}
-        </>
-      )}
-      {isFiltered && shownArtPieces.length === 0 && <p>No art pieces found</p>}
-      {/* the gallery hangs in a 3D hallway, the favorites stay a list */}
-      {isSearchable && shownArtPieces.length > 0 && (
-        <Hallway
-          artPieces={shownArtPieces}
-          artPiecesInfo={artPiecesInfo}
-          onToggleFavorite={onToggleFavorite}
-        />
-      )}
-      {!isSearchable && (
-        <ul className="art-list">
-          {shownArtPieces.map((artPiece) => (
-            <li key={artPiece.slug}>
-              <ArtPiecePreview
-                artPiece={artPiece}
-                isFavorite={isFavorite(artPiecesInfo, artPiece.slug)}
-                onToggleFavorite={onToggleFavorite}
-              />
-            </li>
-          ))}
-        </ul>
-      )}
-    </>
+        </li>
+      ))}
+    </ul>
   );
 }
