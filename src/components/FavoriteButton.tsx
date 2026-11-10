@@ -1,3 +1,5 @@
+import "./FavoriteButton.css";
+
 type FavoriteButtonProps = {
   isFavorite: boolean;
   onToggleFavorite: () => void;
@@ -15,7 +17,9 @@ export default function FavoriteButton({
       aria-pressed={isFavorite}
       onClick={onToggleFavorite}
     >
-      {/* heart icon from Lucide (lucide.dev/icons/heart), filled when favorite */}
+      {/* a little brass picture lamp, like the lamps in the gallery hallway:
+          off it is only an outline, on (favorite) its shade is filled and it
+          shines a cone of light */}
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="24"
@@ -23,12 +27,30 @@ export default function FavoriteButton({
         viewBox="0 0 24 24"
         fill={isFavorite ? "currentColor" : "none"}
         stroke="currentColor"
-        strokeWidth="2"
+        strokeWidth="1.75"
         strokeLinecap="round"
         strokeLinejoin="round"
         aria-hidden="true"
       >
-        <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+        {/* the arm that holds the lamp */}
+        <path d="M12 2v4" fill="none" />
+        {/* the rounded lamp shade and the bulb under it */}
+        <path d="M4.5 12a7.5 6 0 0 1 15 0Z" />
+        <path d="M9.5 12a2.5 2 0 0 0 5 0" />
+        {isFavorite && (
+          <g className="favorite-lamp-light" fill="none">
+            {/* the cone of light */}
+            <path d="M8.5 15.5 6.5 20" />
+            <path d="M12 16v5.5" />
+            <path d="M15.5 15.5l2 4.5" />
+            {/* a little four-pointed twinkle */}
+            <path
+              d="M20.5 14.2l.7 2.1 2.1.7-2.1.7-.7 2.1-.7-2.1-2.1-.7 2.1-.7Z"
+              fill="currentColor"
+              stroke="none"
+            />
+          </g>
+        )}
       </svg>
     </button>
   );

@@ -1,0 +1,80 @@
+/* the favorite button: a little gallery lamp in a round button; it switches
+   on (warm gold, with a cone of light and a soft glow) for a favorite; the
+   lamp colors follow the theme (styles.css), the dark Spotlight stage and
+   hallway set their own (ivory off, gold on) */
+.favorite-button {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  color: var(--color-lamp-off);
+  cursor: pointer;
+  background: var(--color-surface);
+  border: none;
+  border-radius: 50%;
+}
+
+.favorite-button svg {
+  overflow: visible;
+  transition: filter 0.3s ease;
+}
+
+.favorite-button[aria-pressed="true"] {
+  color: var(--color-lamp-on);
+}
+
+/* the lamp glows warm when it is on */
+.favorite-button[aria-pressed="true"] svg {
+  filter: drop-shadow(0 0 3px currentColor);
+}
+
+/* the light fades in from the lamp downwards, and the twinkle sparkles */
+.favorite-lamp-light {
+  transform-origin: 12px 12px;
+  animation: favorite-lamp-switch-on 0.45s ease-out;
+}
+
+.favorite-lamp-light path:last-child {
+  transform-origin: 20.5px 17px;
+  animation: favorite-lamp-twinkle 0.6s ease-out;
+}
+
+@keyframes favorite-lamp-switch-on {
+  from {
+    opacity: 0;
+    transform: scaleY(0.4);
+  }
+}
+
+@keyframes favorite-lamp-twinkle {
+  0%,
+  40% {
+    opacity: 0;
+    transform: scale(0.2) rotate(-45deg);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1.4) rotate(0deg);
+  }
+}
+
+.favorite-button:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+
+/* less motion: the lamp just turns on */
+@media (prefers-reduced-motion: reduce) {
+  .favorite-button svg {
+    transition: none;
+  }
+
+  .favorite-lamp-light,
+  .favorite-lamp-light path:last-child {
+    animation: none;
+  }
+}

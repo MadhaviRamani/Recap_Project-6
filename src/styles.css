@@ -12,8 +12,10 @@
   --color-background: #f6f4ef;
   --color-muted: #666;
   --color-surface: white;
-  --color-icon: #444;
-  --color-favorite: #d6336c;
+  /* the lamp of the favorite button (FavoriteButton.css): off an outline,
+     on (favorite) warm amber gold; both at least 3:1 on the light surface */
+  --color-lamp-off: #444;
+  --color-lamp-on: #9a6a12;
   --color-link: LinkText;
   /* the navigation bar: warm bronze like the Spotlight stage */
   --color-nav-background: #241d15;
@@ -72,8 +74,8 @@ html {
   --color-background: #181816;
   --color-muted: #a8a6a1;
   --color-surface: #2a2a27;
-  --color-icon: #e0e0e0;
-  --color-favorite: #ff7aa5;
+  --color-lamp-off: #e0e0e0;
+  --color-lamp-on: #f0c35a;
   --color-link: #8ab4f8;
   --color-nav-background: #1a150f;
   --color-nav-link: #e8dfcf;
@@ -143,26 +145,6 @@ main {
 .art-piece h2,
 .art-piece p {
   margin: 0.25rem 0 0;
-}
-
-.favorite-button {
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  display: grid;
-  place-items: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  padding: 0;
-  color: var(--color-icon);
-  cursor: pointer;
-  background: var(--color-surface);
-  border: none;
-  border-radius: 50%;
-}
-
-.favorite-button[aria-pressed="true"] {
-  color: var(--color-favorite);
 }
 
 .details {
