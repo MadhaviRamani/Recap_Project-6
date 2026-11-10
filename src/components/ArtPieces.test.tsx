@@ -98,6 +98,41 @@ test("clicking a favorite button toggles the favorite of that art piece", async 
   expect(handleToggleFavorite).toHaveBeenCalledWith("the-harvesters");
 });
 
+describe("hallway", () => {
+  test("the searchable gallery hangs the art pieces in the hallway", () => {
+    render(
+      <MemoryRouter>
+        <ArtPieces
+          artPieces={artPieces}
+          artPiecesInfo={[]}
+          onToggleFavorite={vi.fn()}
+          isSearchable
+        />
+      </MemoryRouter>
+    );
+
+    expect(screen.getByRole("list", { name: "Left wall" })).toBeInTheDocument();
+    expect(screen.getAllByRole("listitem")).toHaveLength(2);
+  });
+
+  test("the favorites list is not a hallway", () => {
+    render(
+      <MemoryRouter>
+        <ArtPieces
+          artPieces={artPieces}
+          artPiecesInfo={[]}
+          onToggleFavorite={vi.fn()}
+        />
+      </MemoryRouter>
+    );
+
+    expect(
+      screen.queryByRole("list", { name: "Left wall" })
+    ).not.toBeInTheDocument();
+    expect(screen.getByRole("list")).toHaveClass("art-list");
+  });
+});
+
 describe("search", () => {
   function renderSearchableArtPieces() {
     render(
