@@ -4,12 +4,56 @@
   box-sizing: border-box;
 }
 
+/* the colors of the light theme; the dark theme overrides them below */
+:root {
+  /* native buttons, inputs, selects and textareas follow the theme */
+  color-scheme: light;
+  --color-text: #222;
+  --color-background: #f6f4ef;
+  --color-muted: #666;
+  --color-surface: white;
+  --color-icon: #444;
+  --color-favorite: #d6336c;
+  --color-link: LinkText;
+  --color-nav-background: #222;
+  --color-nav-link: #ccc;
+  --color-nav-active: white;
+  --color-border: #0002;
+  --color-shadow: #0002;
+  --color-switch-off: #767676;
+  --color-switch-on: #2f6f4e;
+}
+
+/* set on <html> by App when dark mode is turned on;
+   every text color has a contrast of at least 4.5:1 on its background */
+[data-theme="dark"] {
+  color-scheme: dark;
+  --color-text: #e8e6e3;
+  --color-background: #181816;
+  --color-muted: #a8a6a1;
+  --color-surface: #2a2a27;
+  --color-icon: #e0e0e0;
+  --color-favorite: #ff7aa5;
+  --color-link: #8ab4f8;
+  --color-nav-background: #000;
+  --color-nav-link: #bdbdbd;
+  --color-nav-active: white;
+  --color-border: #fff3;
+  --color-shadow: #0008;
+  --color-switch-off: #8a8a85;
+  --color-switch-on: #4caf7d;
+}
+
 body {
   margin: 0;
   font-family: system-ui, sans-serif;
   line-height: 1.5;
-  color: #222;
-  background: #f6f4ef;
+  color: var(--color-text);
+  background: var(--color-background);
+}
+
+a {
+  color: var(--color-link);
 }
 
 main {
@@ -27,16 +71,17 @@ nav {
   justify-content: center;
   gap: 1.5rem;
   padding: 1rem;
-  background: #222;
+  background: var(--color-nav-background);
+  border-top: 1px solid var(--color-border);
 }
 
 nav a {
-  color: #ccc;
+  color: var(--color-nav-link);
   text-decoration: none;
 }
 
 nav a.active {
-  color: white;
+  color: var(--color-nav-active);
   text-decoration: underline;
 }
 
@@ -204,15 +249,15 @@ nav a.active {
   width: 2.5rem;
   height: 2.5rem;
   padding: 0;
-  color: #444;
+  color: var(--color-icon);
   cursor: pointer;
-  background: white;
+  background: var(--color-surface);
   border: none;
   border-radius: 50%;
 }
 
 .favorite-button[aria-pressed="true"] {
-  color: #d6336c;
+  color: var(--color-favorite);
 }
 
 .details {
@@ -250,7 +295,7 @@ nav a.active {
   height: var(--swatch-size);
   margin: calc((var(--swatch-small) - var(--swatch-size)) / 2);
   border-radius: 50%;
-  border: 1px solid #0003;
+  border: 1px solid var(--color-border);
   transform: scale(calc(2.5 / 5.5));
   transition:
     transform 0.2s,
@@ -266,7 +311,7 @@ nav a.active {
      instead of being covered */
   margin-inline: 0;
   transform: scale(1);
-  box-shadow: 0 0.25rem 0.75rem #0004;
+  box-shadow: 0 0.25rem 0.75rem var(--color-shadow);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -305,7 +350,7 @@ nav a.active {
 /* marks the circle whose similar art pieces are shown;
    thick because the outline is scaled down with the small circle */
 .palette-swatch:has(.palette-similar[aria-pressed="true"]) {
-  outline: 6px solid #222;
+  outline: 6px solid var(--color-text);
   outline-offset: 4px;
 }
 
@@ -337,13 +382,13 @@ nav a.active {
 
 .comments li {
   padding: 0.5rem 0;
-  border-bottom: 1px solid #0002;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .comments time {
   display: block;
   font-size: 0.8rem;
-  color: #666;
+  color: var(--color-muted);
 }
 
 .comment-form {
@@ -392,6 +437,68 @@ nav a.active {
   flex: 1 1 10rem;
   padding: 0.75rem 1rem;
   border-radius: 0.5rem;
+  background: var(--color-surface);
+  box-shadow: 0 1px 3px var(--color-shadow);
+}
+
+/* the Dark mode button looks like a switch: a track with a sliding knob */
+.theme-switch {
+  display: inline-flex;
+  gap: 0.75rem;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0.25rem 0.5rem;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  background: none;
+  border: none;
+  border-radius: 0.5rem;
+}
+
+.theme-switch:focus-visible {
+  outline: 2px solid var(--color-link);
+  outline-offset: 2px;
+}
+
+.theme-switch-track {
+  position: relative;
+  flex-shrink: 0;
+  width: 3rem;
+  height: 1.75rem;
+  border-radius: 1rem;
+  background: var(--color-switch-off);
+  transition: background 0.2s;
+}
+
+.theme-switch-track::after {
+  content: "";
+  position: absolute;
+  top: 0.25rem;
+  left: 0.25rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 50%;
   background: white;
-  box-shadow: 0 1px 3px #0002;
+  transition: transform 0.2s;
+}
+
+.theme-switch[aria-checked="true"] .theme-switch-track {
+  background: var(--color-switch-on);
+}
+
+.theme-switch[aria-checked="true"] .theme-switch-track::after {
+  transform: translateX(1.25rem);
+}
+
+.theme-switch-state {
+  min-width: 1.75rem;
+  color: var(--color-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-switch-track,
+  .theme-switch-track::after {
+    transition: none;
+  }
 }

@@ -43,16 +43,19 @@ const artPiecesInfo: ArtPieceInfo[] = [
 
 function renderProfile(props: Partial<ComponentProps<typeof Profile>> = {}) {
   const onChangeProfileName = vi.fn();
+  const onToggleDarkMode = vi.fn();
   render(
     <Profile
       profileName="Art Lover"
       artPieces={artPieces}
       artPiecesInfo={artPiecesInfo}
       onChangeProfileName={onChangeProfileName}
+      isDarkMode={false}
+      onToggleDarkMode={onToggleDarkMode}
       {...props}
     />
   );
-  return { onChangeProfileName };
+  return { onChangeProfileName, onToggleDarkMode };
 }
 
 test("shows the profile name", () => {
@@ -161,4 +164,40 @@ test("does not change the art pieces or the art piece info", () => {
 
   expect(artPieces).toEqual(artPiecesCopy);
   expect(artPiecesInfo).toEqual(artPiecesInfoCopy);
+});
+
+test("shows a Settings section below the profile information", () => {
+  renderProfile();
+
+  const settingsHeading = screen.getByRole("heading", { name: "Settings" });
+  const favorites = screen.getByText("Favorites: 2");
+  expect(
+    favorites.compareDocumentPosition(settingsHeading) &
+      Node.DOCUMENT_POSITION_FOLLOWING
+  ).toBeTruthy();
+});
+
+test("the Dark mode switch is off when dark mode is off", () => {
+  renderProfile({ isDarkMode: false });
+
+  const toggle = screen.getByRole("switch", { name: "Dark mode" });
+  expect(toggle).toHaveAttribute("aria-checked", "false");
+  expect(toggle).toHaveTextContent("Off");
+});
+
+test("the Dark mode switch is on when dark mode is on", () => {
+  renderProfile({ isDarkMode: true });
+
+  const toggle = screen.getByRole("switch", { name: "Dark mode" });
+  expect(toggle).toHaveAttribute("aria-checked", "true");
+  expect(toggle).toHaveTextContent("On");
+});
+
+test("clicking the Dark mode switch calls the toggle handler", async () => {
+  const user = userEvent.setup();
+  const { onToggleDarkMode } = renderProfile();
+
+  await user.click(screen.getByRole("switch", { name: "Dark mode" }));
+
+  expect(onToggleDarkMode).toHaveBeenCalledTimes(1);
 });
