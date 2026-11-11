@@ -130,6 +130,37 @@ test("shows the favorites and toggles the favorite of an art piece", async () =>
   expect(handleToggleFavorite).toHaveBeenCalledWith("art-piece-11");
 });
 
+test("gives every art piece on a wall its place, counted from the near end", () => {
+  renderHallway(createArtPieces(11));
+
+  for (const name of ["Left wall", "Right wall"]) {
+    const items = within(screen.getByRole("list", { name })).getAllByRole(
+      "listitem"
+    );
+    expect(
+      items.map((item) => item.style.getPropertyValue("--hallway-place"))
+    ).toEqual(["1", "2", "3", "4", "5"]);
+  }
+  const frontItem = within(
+    screen.getByRole("list", { name: "Front wall" })
+  ).getByRole("listitem");
+  expect(frontItem.style.getPropertyValue("--hallway-place")).toBe("1");
+});
+
+test("the lamp, its light and the art piece turn together, the list item stays", () => {
+  const { container } = renderHallway(createArtPieces(11));
+
+  const items = container.querySelectorAll(".hallway-item");
+  expect(items).toHaveLength(11);
+  for (const item of items) {
+    const art = item.querySelector(":scope > .hallway-item-art");
+    expect(art).not.toBeNull();
+    expect(art?.querySelector(".hallway-lamp")).not.toBeNull();
+    expect(art?.querySelector(".hallway-light")).not.toBeNull();
+    expect(art?.querySelector(".art-piece")).not.toBeNull();
+  }
+});
+
 describe("hover and keyboard", () => {
   function getWallLink(number: number) {
     return screen
