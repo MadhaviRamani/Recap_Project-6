@@ -273,50 +273,6 @@ main {
   max-width: 24rem;
 }
 
-.profile {
-  max-width: 32rem;
-}
-
-.profile-name,
-.profile-form {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  align-items: center;
-}
-
-.profile-name h2 {
-  margin: 0;
-  overflow-wrap: anywhere;
-}
-
-.profile-form label {
-  flex-basis: 100%;
-}
-
-.profile-form input {
-  flex: 1 1 12rem;
-  min-width: 0;
-  padding: 0.5rem;
-  font: inherit;
-}
-
-.profile-stats {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  padding: 0;
-  list-style: none;
-}
-
-.profile-stats li {
-  flex: 1 1 10rem;
-  padding: 0.75rem 1rem;
-  border-radius: 0.5rem;
-  background: var(--color-surface);
-  box-shadow: 0 1px 3px var(--color-shadow);
-}
-
 /* the Dark mode button looks like a switch: a track with a sliding knob */
 .theme-switch {
   display: inline-flex;

@@ -2,6 +2,7 @@ import { useState, type SubmitEvent } from "react";
 
 import type { ArtPiece, ArtPieceInfo } from "../types";
 import { isFavorite } from "../utils/artPiecesInfo";
+import "./Profile.css";
 
 type ProfileProps = {
   profileName: string;
@@ -12,6 +13,23 @@ type ProfileProps = {
   onToggleDarkMode: () => void;
 };
 
+// a plaque with a big number; screen readers hear the label and the number
+// together, e.g. "Art pieces: 11"
+function Plaque({ label, count }: { label: string; count: number }) {
+  return (
+    <li className="office-plaque">
+      <span className="visually-hidden">{`${label}: ${count}`}</span>
+      <span className="office-plaque-count" aria-hidden="true">
+        {count}
+      </span>
+      <span className="office-plaque-label" aria-hidden="true">
+        {label}
+      </span>
+    </li>
+  );
+}
+
+// the Profile page is the curator's office of the royal gallery
 export default function Profile({
   profileName,
   artPieces,
@@ -47,10 +65,14 @@ export default function Profile({
   }
 
   return (
-    <>
-      <section className="profile" aria-labelledby="profile-name">
+    <div className="office">
+      <section className="profile office-desk" aria-labelledby="profile-name">
+        {/* the name on a brass nameplate */}
         {isEditing ? (
-          <form className="profile-form" onSubmit={handleSubmit}>
+          <form
+            className="profile-form office-nameplate"
+            onSubmit={handleSubmit}
+          >
             <label htmlFor="profile-name-input">Profile name</label>
             <input
               id="profile-name-input"
@@ -67,19 +89,22 @@ export default function Profile({
             </button>
           </form>
         ) : (
-          <div className="profile-name">
+          <div className="profile-name office-nameplate">
             <h2 id="profile-name">{profileName}</h2>
             <button type="button" onClick={startEditing}>
               Edit name
             </button>
           </div>
         )}
-        <ul className="profile-stats">
-          <li>Art pieces: {artPieces.length}</li>
-          <li>Favorites: {favoritesCount}</li>
+        <ul className="profile-stats office-plaques">
+          <Plaque label="Art pieces" count={artPieces.length} />
+          <Plaque label="Favorites" count={favoritesCount} />
         </ul>
       </section>
-      <section className="settings" aria-labelledby="settings-heading">
+      <section
+        className="settings office-panel"
+        aria-labelledby="settings-heading"
+      >
         <h2 id="settings-heading">Settings</h2>
         {/* a switch: screen readers announce its on/off state via aria-checked */}
         <button
@@ -96,6 +121,6 @@ export default function Profile({
           </span>
         </button>
       </section>
-    </>
+    </div>
   );
 }
