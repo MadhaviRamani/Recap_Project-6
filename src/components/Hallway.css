@@ -203,8 +203,34 @@ main:has(.hallway) {
 
 /* one art piece with its lamp above it */
 .hallway-item {
+  /* how far the neighbours of a grown art piece move aside; the right wall
+     hangs its art pieces in reverse order, so they move the other way */
+  --hallway-push: 3.5rem;
   position: relative;
   padding-top: 3.25rem;
+  transition: transform 0.3s ease;
+}
+
+.hallway-wall-right .hallway-item {
+  --hallway-push: -3.5rem;
+}
+
+/* the art piece the user points at (or reaches with the keyboard) grows on
+   its wall, with its frame, lamp, label and favorite button, and stays in
+   front of its neighbours */
+.hallway-item:hover,
+.hallway-item:focus-within {
+  z-index: 4;
+  transform: scale(1.3);
+}
+
+/* its neighbours move aside, so the grown art piece does not cover them */
+.hallway-item:is(:hover, :focus-within) + .hallway-item {
+  transform: translateX(var(--hallway-push));
+}
+
+.hallway-item:has(+ .hallway-item:is(:hover, :focus-within)) {
+  transform: translateX(calc(-1 * var(--hallway-push)));
 }
 
 /* the royal lamp: a brass picture light on a short arm above the frame */
@@ -446,6 +472,16 @@ main:has(.hallway) {
     max-width: 100%;
   }
 
+  /* the art pieces are stacked and as wide as the screen, so they do not
+     grow; growing would make the page scroll sideways */
+  .hallway-item,
+  .hallway-item:hover,
+  .hallway-item:focus-within,
+  .hallway-item:is(:hover, :focus-within) + .hallway-item,
+  .hallway-item:has(+ .hallway-item:is(:hover, :focus-within)) {
+    transform: none;
+  }
+
   /* vw, not %: the art piece is only as wide as its image */
   .hallway .art-piece img,
   .hallway-wall-front .art-piece img {
@@ -455,9 +491,14 @@ main:has(.hallway) {
   }
 }
 
-/* less motion: the lamps shine steadily */
+/* less motion: the lamps shine steadily, and the art pieces grow and move
+   aside at once, without a transition */
 @media (prefers-reduced-motion: reduce) {
   .hallway-light {
     animation: none;
+  }
+
+  .hallway-item {
+    transition: none;
   }
 }
