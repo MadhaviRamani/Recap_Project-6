@@ -11,7 +11,8 @@ main:has(.hallway) {
 
 /* the gallery as a 3D hallway: the viewer stands at its open end and looks
    down the hallway to the front wall; it is a dark, warmly lit hallway in
-   both themes, so the lamps always show */
+   the dark theme and a light gallery in daylight in the light theme (see
+   the end of this file) */
 .hallway {
   /* how far the hallway runs back */
   --hallway-depth: 140rem;
@@ -587,5 +588,175 @@ main:has(.hallway) {
 
   .hallway-item-art {
     transition: none;
+  }
+}
+
+/* the gallery in daylight: in the light theme the hallway is a light
+   gallery with cream plaster walls, a light oak floor and a light ceiling;
+   only colors, backgrounds, shadows and borders change, the 3D hallway and
+   its hover stay the same; the labels sit on the wall, so the far wall is
+   kept light enough for the dark gold artist (at least 4.5:1) */
+[data-theme="light"] .hallway {
+  /* the near wall is lighter than the far wall */
+  --wall-near: var(--daylight-wall);
+  --wall-far: color-mix(
+    in srgb,
+    var(--daylight-wall-deep) 50%,
+    var(--daylight-wall)
+  );
+  color: var(--daylight-text);
+}
+
+/* the side walls with only a faint shadow at the open end */
+[data-theme="light"] .hallway-wall-left {
+  background:
+    radial-gradient(
+      ellipse 60% 40% at 0% 50%,
+      rgb(80 60 30 / 0.06),
+      transparent
+    ),
+    linear-gradient(to right, var(--wall-near), var(--wall-far));
+}
+
+[data-theme="light"] .hallway-wall-right {
+  background:
+    radial-gradient(
+      ellipse 60% 40% at 100% 50%,
+      rgb(80 60 30 / 0.06),
+      transparent
+    ),
+    linear-gradient(to left, var(--wall-near), var(--wall-far));
+}
+
+/* the front wall in soft sunlight */
+[data-theme="light"] .hallway-wall-front {
+  background:
+    radial-gradient(
+      ellipse 50% 60% at 50% 35%,
+      rgb(var(--daylight-sun) / 0.6),
+      transparent
+    ),
+    var(--wall-far);
+}
+
+/* the floor: light oak planks, the runner with its gold edges stays */
+[data-theme="light"] .hallway-floor {
+  background:
+    linear-gradient(to top, transparent, rgb(80 60 30 / 0.3)),
+    /* the soft sheen of the carpet, light in the middle */
+    linear-gradient(
+        90deg,
+        transparent 34%,
+        rgb(255 255 255 / 0.06) 50%,
+        transparent 66%
+      ),
+    /* the runner with its gold edges */
+    linear-gradient(
+        90deg,
+        transparent 33%,
+        var(--frame-gold) 33% 33.5%,
+        var(--color-runway) 33.5% 34.5%,
+        var(--frame-gold-light) 34.5% 34.7%,
+        var(--color-runway) 34.7% 65.3%,
+        var(--frame-gold-light) 65.3% 65.5%,
+        var(--color-runway) 65.5% 66.5%,
+        var(--frame-gold) 66.5% 67%,
+        transparent 67%
+      ),
+    repeating-linear-gradient(
+      90deg,
+      var(--daylight-floor) 0 5.5rem,
+      var(--daylight-floor-dark) 5.5rem 5.75rem,
+      color-mix(in srgb, var(--daylight-floor) 85%, var(--daylight-floor-dark))
+        5.75rem 11rem,
+      var(--daylight-floor-dark) 11rem 11.25rem
+    );
+}
+
+/* the light ceiling with a soft strip of daylight down its middle */
+[data-theme="light"] .hallway-ceiling {
+  background:
+    linear-gradient(
+      90deg,
+      transparent 40%,
+      rgb(var(--daylight-sun) / 0.9) 50%,
+      transparent 60%
+    ),
+    linear-gradient(
+      var(--daylight-wall-deep),
+      color-mix(
+        in srgb,
+        var(--daylight-wall-deep) 80%,
+        var(--daylight-floor-dark)
+      )
+    );
+}
+
+/* the brass lamps stay gold, with a softer shadow */
+[data-theme="light"] .hallway-lamp {
+  box-shadow:
+    0 0.125rem 0.25rem rgb(80 60 30 / 0.45),
+    0 0.5rem 1rem rgb(var(--lamp-light) / 0.55);
+}
+
+/* in daylight the lamps shine more softly */
+[data-theme="light"] .hallway-light {
+  background: linear-gradient(
+    rgb(var(--lamp-light) / 0.3),
+    rgb(var(--lamp-light) / 0.08) 70%,
+    transparent
+  );
+}
+
+/* the golden frames cast a softer shadow onto the light wall */
+[data-theme="light"] .hallway .art-piece img,
+[data-theme="light"] .hallway-empty-frame {
+  box-shadow:
+    /* the carved outer bead of the frame */
+    0 0 0 2px var(--frame-gold-dark),
+    0 0 0 3px var(--frame-gold-shine),
+    0 2rem 2rem -0.5rem rgb(80 60 30 / 0.3),
+    0 0 3rem rgb(var(--lamp-light) / 0.15);
+}
+
+/* the museum label in dark brown and dark gold */
+[data-theme="light"] .hallway .art-piece h2 {
+  color: var(--daylight-text);
+}
+
+[data-theme="light"] .hallway .art-piece p {
+  color: var(--daylight-gold-text);
+}
+
+/* the favorite button: light glass with a dark lamp, dark gold when on */
+[data-theme="light"] .hallway .favorite-button {
+  color: var(--daylight-text);
+  background: var(--daylight-glass);
+  border-color: var(--daylight-glass-border);
+  box-shadow: 0 0.25rem 0.75rem var(--daylight-shadow);
+}
+
+[data-theme="light"] .hallway .favorite-button[aria-pressed="true"] {
+  color: var(--daylight-gold-text);
+  border-color: var(--daylight-gold-text);
+}
+
+/* the keyboard focus shows a dark gold ring */
+[data-theme="light"] .hallway a:focus-visible,
+[data-theme="light"] .hallway button:focus-visible,
+[data-theme="light"] .hallway .art-piece a:focus-visible img {
+  outline-color: var(--daylight-gold-text);
+}
+
+/* small screens in daylight: one flat, light wall */
+@media (max-width: 48rem) {
+  [data-theme="light"] .hallway {
+    background: linear-gradient(var(--wall-near), var(--wall-far));
+  }
+
+  [data-theme="light"] .hallway-wall-left,
+  [data-theme="light"] .hallway-wall-right,
+  [data-theme="light"] .hallway-wall-front {
+    background: none;
   }
 }

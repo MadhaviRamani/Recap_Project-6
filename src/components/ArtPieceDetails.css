@@ -487,3 +487,152 @@ main:has(.details-room) {
     animation: none;
   }
 }
+
+/* the light theme: the viewing room in daylight; a cream wall in soft
+   daylight, the same golden frame and brass lamp, light frosted glass with
+   dark brown text and dark gold edges; only colors, backgrounds, borders
+   and shadows change, the dark room above stays as it is */
+[data-theme="light"] .details-room {
+  /* the light frosted glass, also used by the solid fallback without
+     backdrop-filter support */
+  --glass: var(--daylight-glass);
+  --glass-solid: var(--daylight-glass-solid);
+  --glass-border: var(--daylight-glass-border);
+  color: var(--daylight-text);
+  /* a cream wall: brightest where the daylight and the lamp fall on the
+     frame, a little deeper towards the floor */
+  background:
+    radial-gradient(
+      ellipse 55% 50% at 32% 18%,
+      rgb(var(--daylight-sun) / 0.9),
+      transparent 75%
+    ),
+    radial-gradient(
+      ellipse 60% 40% at 70% 30%,
+      rgb(var(--daylight-sun) / 0.4),
+      transparent 80%
+    ),
+    linear-gradient(
+      var(--daylight-wall),
+      var(--daylight-wall) 60%,
+      var(--daylight-wall-deep)
+    );
+  box-shadow: inset 0 0 8rem var(--daylight-shadow);
+}
+
+[data-theme="light"] .details-back {
+  color: var(--daylight-text);
+}
+
+[data-theme="light"] .details-back:hover {
+  border-color: var(--daylight-gold-text);
+  box-shadow: 0 0 1rem var(--daylight-shadow);
+}
+
+/* in daylight the light cone of the lamp is only a soft warm glow */
+[data-theme="light"] .details-light {
+  background: linear-gradient(
+    rgb(var(--lamp-light) / 0.35),
+    rgb(var(--lamp-light) / 0.1) 70%,
+    transparent
+  );
+  mix-blend-mode: normal;
+}
+
+/* the same golden frame, with a softer shadow on the light wall */
+[data-theme="light"] .details-frame img {
+  box-shadow:
+    0 0 0 2px var(--frame-gold-dark),
+    0 0 0 3px var(--frame-gold-shine),
+    0 2rem 2.5rem -0.5rem rgb(80 60 30 / 0.45),
+    0 0 5rem rgb(var(--lamp-light) / 0.2);
+}
+
+/* the favorite button: light glass with a dark icon, dark gold when on */
+[data-theme="light"] .details-frame .favorite-button {
+  color: var(--daylight-text);
+  background: var(--daylight-glass-solid);
+  box-shadow: 0 0.25rem 0.75rem var(--daylight-shadow);
+}
+
+[data-theme="light"] .details-frame .favorite-button[aria-pressed="true"] {
+  color: var(--daylight-gold-text);
+  border-color: var(--daylight-gold-text);
+}
+
+[data-theme="light"] .details-placard,
+[data-theme="light"] .details-panel {
+  box-shadow: 0 1rem 2rem var(--daylight-shadow);
+}
+
+/* the gold text and lines turn dark gold to stay readable on the glass */
+[data-theme="light"] .details-artist,
+[data-theme="light"] .details-placard dt,
+[data-theme="light"] .details-room h2,
+[data-theme="light"] .details-room h3,
+[data-theme="light"] .details-room .comments time,
+[data-theme="light"] .details-room .comment-form label {
+  color: var(--daylight-gold-text);
+}
+
+[data-theme="light"] .details-artist::after {
+  background: var(--daylight-gold-text);
+}
+
+/* the color circles get a dark gold ring */
+[data-theme="light"] .details-room .palette-swatch {
+  border-color: var(--daylight-gold-text);
+}
+
+[data-theme="light"]
+  .details-room
+  .palette-swatch:has(.palette-similar[aria-pressed="true"]) {
+  outline-color: var(--daylight-gold-text);
+}
+
+[data-theme="light"] .details-room .similar-art a {
+  color: var(--daylight-text);
+}
+
+[data-theme="light"] .details-room .similar-art img {
+  box-shadow:
+    0 0 0 1px var(--frame-gold-dark),
+    0 0.5rem 1rem var(--daylight-shadow);
+}
+
+[data-theme="light"] .details-room .similar-art a:hover span {
+  color: var(--daylight-gold-text);
+}
+
+/* the comment cards: a slightly darker cream on the glass */
+[data-theme="light"] .details-room .comments li {
+  background: rgb(122 90 28 / 0.07);
+  border-color: rgb(122 90 28 / 0.3);
+}
+
+/* Edit, Save, Cancel and Delete: light glass buttons; the gold Send
+   button keeps its look */
+[data-theme="light"] .details-room .comments button:not([type="submit"]),
+[data-theme="light"] .details-room .comment-form button:not([type="submit"]) {
+  color: var(--daylight-text);
+  background: var(--daylight-glass-solid);
+}
+
+[data-theme="light"] .details-room .comments button:not([type="submit"]):hover,
+[data-theme="light"]
+  .details-room
+  .comment-form
+  button:not([type="submit"]):hover {
+  border-color: var(--daylight-gold-text);
+}
+
+/* the ivory field gets a darker gold edge to stand out on the glass */
+[data-theme="light"] .details-room .comment-form textarea {
+  border-color: var(--daylight-gold-text);
+}
+
+[data-theme="light"] .details-room a:focus-visible,
+[data-theme="light"] .details-room button:focus-visible,
+[data-theme="light"] .details-room textarea:focus-visible {
+  outline-color: var(--daylight-gold-text);
+}

@@ -56,8 +56,8 @@ export default function App() {
     useState<ArtPieceInfo[]>(loadArtPiecesInfo);
 
   const [profileName, setProfileName] = useState<string>(DEFAULT_PROFILE_NAME);
-  // the app starts in the light theme
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
+  // the app starts in the dark theme, the look of the royal gallery
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(true);
 
   const { pathname } = useLocation();
   const [search, setSearch] = useState<Search>({

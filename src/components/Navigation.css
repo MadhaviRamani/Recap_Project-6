@@ -262,3 +262,79 @@
     background: linear-gradient(#4e3e2a, var(--color-nav-background));
   }
 }
+
+/* the navigation bar in daylight: light ivory glass with dark brown text and
+   dark gold accents; only colors, backgrounds, borders and shadows change */
+[data-theme="light"] .navigation {
+  /* nearly opaque, so the text stays readable over dark page content */
+  background: linear-gradient(
+    color-mix(in srgb, var(--daylight-glass-solid) 94%, transparent),
+    color-mix(in srgb, var(--daylight-wall) 92%, transparent)
+  );
+  border-bottom-color: var(--daylight-glass-border);
+  box-shadow:
+    inset 0 1px 0 rgb(var(--daylight-sun) / 0.4),
+    0 0.75rem 1.75rem -0.75rem var(--daylight-shadow);
+}
+
+/* the links: soft dark brown, darker on hover */
+[data-theme="light"] .navigation a {
+  color: color-mix(
+    in srgb,
+    var(--daylight-text) 85%,
+    var(--daylight-glass-solid)
+  );
+}
+
+[data-theme="light"] .navigation a:focus-visible {
+  outline-color: var(--daylight-gold-text);
+}
+
+[data-theme="light"] .navigation .navigation-logo,
+[data-theme="light"] .navigation .navigation-links a:hover {
+  color: var(--daylight-text);
+}
+
+/* a lighter shadow under the logo square */
+[data-theme="light"] .navigation-logo-mark {
+  filter: drop-shadow(0 2px 3px var(--daylight-shadow));
+}
+
+/* the dark gold of the logo frame, the logo text and the lines */
+[data-theme="light"] .navigation-logo-frame {
+  stroke: var(--daylight-gold-text);
+}
+
+[data-theme="light"] .navigation-logo-text,
+[data-theme="light"] .navigation .navigation-links a.active {
+  color: var(--daylight-gold-text);
+}
+
+[data-theme="light"] .navigation-links a::after {
+  background: var(--daylight-gold-text);
+}
+
+/* the ring of the Profile link stays fully dark gold, so it is visible
+   on the light bar */
+[data-theme="light"] .navigation .navigation-profile,
+[data-theme="light"] .navigation .navigation-profile:hover {
+  border-color: var(--daylight-gold-text);
+}
+
+/* the current page: a filled dark gold ring with an ivory icon (also on
+   hover, so it wins over the hover color of the links) */
+[data-theme="light"] .navigation .navigation-links .navigation-profile.active {
+  color: var(--daylight-glass-solid);
+  background: var(--daylight-gold-text);
+  border-color: var(--daylight-gold-text);
+}
+
+/* without frosted glass support, the bar is solid ivory */
+@supports not (backdrop-filter: blur(1px)) {
+  [data-theme="light"] .navigation {
+    background: linear-gradient(
+      var(--daylight-glass-solid),
+      var(--daylight-wall)
+    );
+  }
+}

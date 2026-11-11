@@ -1,7 +1,7 @@
 /* the Profile page is the curator's office of the royal gallery: dark and
-   warmly lit in both themes like the Spotlight, the hallway and the
-   details room; the whole page under the navigation is the office, so the
-   page heading stands in it too */
+   warmly lit like the Spotlight, the hallway and the details room (light
+   in daylight, see the end of the file); the whole page under the
+   navigation is the office, so the page heading stands in it too */
 main:has(.office) {
   /* the warm light of the desk lamp */
   --lamp-light: 248 226 182;
@@ -226,4 +226,78 @@ main:has(.office) > h1 {
   .office * {
     transition: none;
   }
+}
+
+/* the office in daylight (dark mode off): light oak panels in soft daylight,
+   light frosted glass with dark brown letters and dark gold edges; the brass
+   nameplate stays as it is */
+[data-theme="light"] main:has(.office) {
+  /* the glass panels and plaques: light frosted glass */
+  --glass: var(--daylight-glass);
+  --glass-solid: var(--daylight-glass-solid);
+  --glass-border: var(--daylight-glass-border);
+  color: var(--daylight-text);
+  /* light oak panels with fine honey gaps, lit by the daylight at the top
+     left; the darker honey only glows up from the floor, far from the
+     heading, so the heading keeps its contrast on every panel and gap */
+  background:
+    radial-gradient(
+      ellipse 55% 45% at 22% 12%,
+      rgb(var(--daylight-sun) / 0.55),
+      transparent 75%
+    ),
+    radial-gradient(
+      ellipse 80% 60% at 50% 110%,
+      var(--daylight-floor-dark),
+      transparent 75%
+    ),
+    repeating-linear-gradient(
+      90deg,
+      var(--daylight-wall-deep) 0 9rem,
+      var(--daylight-floor) 9rem 9.25rem,
+      color-mix(in srgb, var(--daylight-wall-deep), var(--daylight-floor))
+        9.25rem 18rem,
+      var(--daylight-floor) 18rem 18.25rem
+    );
+  box-shadow: inset 0 0 8rem var(--daylight-shadow);
+}
+
+/* the heading in a deep dark gold: at least 4.5:1 on the darkest wood */
+[data-theme="light"] main:has(.office) > h1 {
+  color: #5c4314;
+}
+
+[data-theme="light"] .office-panel {
+  box-shadow: 0 1rem 2rem var(--daylight-shadow);
+}
+
+[data-theme="light"] .office-panel h2,
+[data-theme="light"] .office-plaque-label {
+  color: var(--daylight-gold-text);
+}
+
+[data-theme="light"] .office-plaque {
+  box-shadow: 0 0.75rem 1.5rem var(--daylight-shadow);
+}
+
+/* the dark mode switch on the light glass */
+[data-theme="light"] .office .theme-switch {
+  color: var(--daylight-text);
+}
+
+[data-theme="light"] .office .theme-switch-state {
+  color: var(--daylight-gold-text);
+}
+
+/* the keyboard focus shows a dark gold ring */
+[data-theme="light"] .office a:focus-visible,
+[data-theme="light"] .office button:focus-visible,
+[data-theme="light"] .office input:focus-visible {
+  outline-color: var(--daylight-gold-text);
+}
+
+/* on the brass, a dark gold ring would vanish: there it is dark ink */
+[data-theme="light"] .office-nameplate button:focus-visible,
+[data-theme="light"] .office-nameplate input:focus-visible {
+  outline-color: var(--ink);
 }
