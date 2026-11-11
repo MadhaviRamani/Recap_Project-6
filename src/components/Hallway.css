@@ -1,6 +1,6 @@
 /* on the Gallery page the hallway fills the whole page from edge to edge,
    under the navigation bar down to the bottom of the screen, without page
-   scrolling; the search bar lies on its runway */
+   scrolling; the search status lies on its runway */
 main:has(.hallway) {
   display: flex;
   flex-direction: column;
@@ -159,7 +159,7 @@ main:has(.hallway) {
   pointer-events: none;
 }
 
-/* the near end of the runway holds the search bar and the search status,
+/* the near end of the runway holds the search status,
    flat and readable at the bottom middle of the hallway; only its panels
    take the mouse, so the art pieces around it stay clickable */
 .hallway-runway {
@@ -178,10 +178,6 @@ main:has(.hallway) {
 
 .hallway-runway > * {
   pointer-events: auto;
-}
-
-.hallway-runway > .search-bar {
-  align-self: stretch;
 }
 
 /* the art pieces on a wall hang in a row at eye level */
@@ -414,7 +410,7 @@ main:has(.hallway) {
     transform-style: flat;
   }
 
-  /* the search lies at the top of the flat wall, full width */
+  /* the search status lies at the top of the flat wall, full width */
   .hallway-runway {
     position: static;
     width: auto;

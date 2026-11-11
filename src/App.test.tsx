@@ -424,3 +424,88 @@ test("starts with the favorites saved in the local storage", async () => {
     screen.getByRole("heading", { name: "The Harvesters" })
   ).toBeInTheDocument();
 });
+
+describe("search in the navigation", () => {
+  async function search(
+    user: ReturnType<typeof userEvent.setup>,
+    text: string
+  ) {
+    await user.type(
+      await screen.findByRole("searchbox", { name: "Search art pieces" }),
+      text
+    );
+    await user.click(screen.getByRole("button", { name: "Search" }));
+  }
+
+  test("filters the Gallery, and changing pages clears the search", async () => {
+    const user = userEvent.setup();
+    mockFetch({ ok: true, data: artPieces });
+
+    renderApp("/art-pieces");
+    await screen.findAllByRole("listitem");
+    await search(user, "van gogh");
+
+    expect(screen.getAllByRole("listitem")).toHaveLength(1);
+    expect(screen.getByText(/Results for “van gogh”/)).toBeInTheDocument();
+
+    await user.click(screen.getByRole("link", { name: "Spotlight" }));
+    expect(screen.queryByRole("search")).not.toBeInTheDocument();
+    await user.click(screen.getByRole("link", { name: "Gallery" }));
+
+    expect(screen.getAllByRole("listitem")).toHaveLength(2);
+    expect(screen.queryByText(/Results/)).not.toBeInTheDocument();
+  });
+
+  test("filters the Favorites, whose dropdown lists only their nationalities", async () => {
+    localStorage.setItem(
+      "art-pieces-info",
+      JSON.stringify([
+        { slug: "the-harvesters", isFavorite: true, comments: [] },
+      ])
+    );
+    const user = userEvent.setup();
+    mockFetch({ ok: true, data: artPieces });
+
+    renderApp("/favorites");
+    expect(await screen.findAllByRole("listitem")).toHaveLength(1);
+    expect(
+      screen.getAllByRole("option").map((option) => option.textContent)
+    ).toEqual(["All nationalities", "Flemish"]);
+
+    await search(user, "van gogh");
+
+    expect(screen.getByText(/Results for “van gogh”/)).toBeInTheDocument();
+    expect(screen.getByText("No art pieces found")).toBeInTheDocument();
+    expect(screen.queryAllByRole("listitem")).toHaveLength(0);
+
+    await user.click(screen.getByRole("button", { name: "Show all" }));
+
+    expect(screen.getAllByRole("listitem")).toHaveLength(1);
+    expect(screen.queryByText(/Results/)).not.toBeInTheDocument();
+  });
+
+  test("a search in the Gallery does not filter the Favorites", async () => {
+    localStorage.setItem(
+      "art-pieces-info",
+      JSON.stringify([
+        { slug: "the-harvesters", isFavorite: true, comments: [] },
+      ])
+    );
+    const user = userEvent.setup();
+    mockFetch({ ok: true, data: artPieces });
+
+    renderApp("/art-pieces");
+    await screen.findAllByRole("listitem");
+    await search(user, "van gogh");
+    await user.click(screen.getByRole("link", { name: "Favorites" }));
+
+    expect(screen.getAllByRole("listitem")).toHaveLength(1);
+    expect(
+      screen.getByRole("heading", { name: "The Harvesters" })
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/Results/)).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("searchbox", { name: "Search art pieces" })
+    ).toHaveValue("");
+  });
+});

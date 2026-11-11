@@ -20,6 +20,15 @@ test("shows the search input, the nationality dropdown and the Search button in 
   expect(dropdown.nextElementSibling).toBe(button);
 });
 
+test("the Search button shows only a magnifying glass and is named Search", () => {
+  renderSearchBar();
+
+  const button = screen.getByRole("button", { name: "Search" });
+  expect(button).toHaveAttribute("aria-label", "Search");
+  expect(button.textContent).toBe("");
+  expect(button.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
+});
+
 test("the dropdown lists all nationalities after All nationalities", () => {
   renderSearchBar();
 
