@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useState, type SubmitEvent } from "react";
 
 type CommentFormProps = {
   onAddComment: (text: string) => void;
@@ -7,7 +7,7 @@ type CommentFormProps = {
 export default function CommentForm({ onAddComment }: CommentFormProps) {
   const [text, setText] = useState("");
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
     const trimmed = text.trim();
 

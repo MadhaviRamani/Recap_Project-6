@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useState, type SubmitEvent } from "react";
 
 import { cleanSearchText } from "../utils/cleanSearchText";
 import "./SearchBar.css";
@@ -16,7 +16,7 @@ export default function SearchBar({ nationalities, onSearch }: SearchBarProps) {
   // there is only something to search with a text or a chosen nationality
   const canSearch = searchText !== "" || nationality !== "";
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!canSearch) {
       return;
