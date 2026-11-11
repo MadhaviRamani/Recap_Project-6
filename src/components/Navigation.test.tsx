@@ -1,4 +1,5 @@
 import { render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
 
 import Navigation from "./Navigation";
@@ -135,4 +136,74 @@ test("shows Profile only as a user icon without visible text", () => {
   const profile = screen.getByRole("link", { name: "Profile" });
   expect(profile.textContent).toBe("");
   expect(profile.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
+});
+
+describe("search bar", () => {
+  function renderWithSearch(route: string, onSearch = vi.fn()) {
+    render(
+      <MemoryRouter initialEntries={[route]}>
+        <Navigation search={{ nationalities: ["Dutch"], onSearch }} />
+      </MemoryRouter>
+    );
+    return onSearch;
+  }
+
+  test.each(["/art-pieces", "/favorites"])(
+    "is shown in the navigation on %s",
+    (route) => {
+      renderWithSearch(route);
+
+      const navigation = screen.getByRole("navigation", { name: "Main" });
+      expect(within(navigation).getByRole("search")).toBeInTheDocument();
+      expect(
+        within(navigation).getByRole("combobox", { name: "Nationality" })
+      ).toHaveTextContent("Dutch");
+    }
+  );
+
+  test.each(["/", "/art-pieces/the-harvesters", "/profile", "/unknown"])(
+    "is not shown on %s",
+    (route) => {
+      renderWithSearch(route);
+
+      expect(screen.queryByRole("search")).not.toBeInTheDocument();
+    }
+  );
+
+  test("is not shown without a search", () => {
+    renderNavigation("/art-pieces");
+
+    expect(screen.queryByRole("search")).not.toBeInTheDocument();
+  });
+
+  test("sits between the logo and the page links, so Tab reaches it right after the logo", async () => {
+    const user = userEvent.setup();
+    renderWithSearch("/art-pieces");
+
+    await user.tab();
+    expect(
+      screen.getByRole("link", { name: "Art Gallery – Spotlight" })
+    ).toHaveFocus();
+    await user.tab();
+    expect(
+      screen.getByRole("searchbox", { name: "Search art pieces" })
+    ).toHaveFocus();
+    await user.tab();
+    expect(screen.getByRole("combobox", { name: "Nationality" })).toHaveFocus();
+    // the Search button is disabled without a search text
+    await user.tab();
+    expect(screen.getByRole("link", { name: "Spotlight" })).toHaveFocus();
+  });
+
+  test("passes the search to onSearch", async () => {
+    const user = userEvent.setup();
+    const onSearch = renderWithSearch("/favorites");
+
+    await user.type(
+      screen.getByRole("searchbox", { name: "Search art pieces" }),
+      "wave{Enter}"
+    );
+
+    expect(onSearch).toHaveBeenCalledWith("wave", "");
+  });
 });

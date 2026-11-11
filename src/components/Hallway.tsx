@@ -91,7 +91,7 @@ export default function Hallway({
   onToggleFavorite,
   runway,
 }: HallwayProps & {
-  // shown flat on the near end of the runway, e.g. the search bar
+  // shown flat on the near end of the runway, e.g. the search status
   runway?: ReactNode;
 }) {
   const [activeSlug, setActiveSlug] = useState<string | null>(null);

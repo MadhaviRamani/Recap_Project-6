@@ -1,8 +1,24 @@
-import { Link, NavLink } from "react-router";
+import { Link, NavLink, useLocation } from "react-router";
 
+import SearchBar from "./SearchBar";
 import "./Navigation.css";
 
-export default function Navigation() {
+// the pages with a search bar in the navigation
+const SEARCHABLE_PATHS = new Set(["/art-pieces", "/favorites"]);
+
+type NavigationProps = {
+  // the nationalities of the art pieces on the current page and the search
+  // handler; without it, there is no search bar
+  search?: {
+    nationalities: string[];
+    onSearch: (query: string, nationality: string) => void;
+  };
+};
+
+export default function Navigation({ search }: NavigationProps) {
+  const { pathname } = useLocation();
+  const isSearchShown = search !== undefined && SEARCHABLE_PATHS.has(pathname);
+
   return (
     <nav className="navigation" aria-label="Main">
       <div className="navigation-inner">
@@ -56,6 +72,15 @@ export default function Navigation() {
             Art Gallery
           </span>
         </Link>
+        {/* between the logo and the links, so Tab reaches it right after the
+            logo; the key gives every page a fresh, empty search bar */}
+        {isSearchShown && (
+          <SearchBar
+            key={pathname}
+            nationalities={search.nationalities}
+            onSearch={search.onSearch}
+          />
+        )}
         <div className="navigation-links">
           {/* end: without it, the link to / would be active on every page */}
           <NavLink to="/" end>

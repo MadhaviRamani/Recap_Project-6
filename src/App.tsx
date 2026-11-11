@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Route, Routes } from "react-router";
+import { Route, Routes, useLocation } from "react-router";
 import useSWR from "swr";
 
 import ArtPieceDetails from "./components/ArtPieceDetails";
@@ -19,10 +19,20 @@ import {
   loadArtPiecesInfo,
   saveArtPiecesInfo,
 } from "./utils/artPiecesInfoStorage";
+import { getNationalities } from "./utils/artistNationality";
 import "./styles.css";
 
 const API_URL = "https://example-apis.vercel.app/api/art";
 const DEFAULT_PROFILE_NAME = "Art Lover";
+
+// the search from the search bar in the navigation; it belongs to the page
+// it was made on, so every other page starts with all its art pieces
+type Search = {
+  pathname: string;
+  query: string;
+  // "" stands for all nationalities
+  nationality: string;
+};
 
 export async function fetcher(url: string): Promise<ArtPiece[]> {
   const response = await fetch(url);
@@ -48,6 +58,29 @@ export default function App() {
   const [profileName, setProfileName] = useState<string>(DEFAULT_PROFILE_NAME);
   // the app starts in the light theme
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
+
+  const { pathname } = useLocation();
+  const [search, setSearch] = useState<Search>({
+    pathname,
+    query: "",
+    nationality: "",
+  });
+  // moving to another page clears the search; it is reset while rendering,
+  // so the new page never shows the old search first
+  if (search.pathname !== pathname) {
+    setSearch({ pathname, query: "", nationality: "" });
+  }
+  const isSearchOnPage = search.pathname === pathname;
+  const searchQuery = isSearchOnPage ? search.query : "";
+  const searchNationality = isSearchOnPage ? search.nationality : "";
+
+  const favoriteArtPieces = (artPieces ?? []).filter((artPiece) =>
+    isFavorite(artPiecesInfo, artPiece.slug)
+  );
+  // the dropdown lists the nationalities of the art pieces on the page
+  const searchNationalities = getNationalities(
+    pathname === "/favorites" ? favoriteArtPieces : (artPieces ?? [])
+  );
 
   useEffect(() => {
     saveArtPiecesInfo(artPiecesInfo);
@@ -81,6 +114,14 @@ export default function App() {
 
   function handleDeleteComment(slug: string, id: string) {
     setArtPiecesInfo((currentInfo) => deleteComment(currentInfo, slug, id));
+  }
+
+  function handleSearch(query: string, nationality: string) {
+    setSearch({ pathname, query, nationality });
+  }
+
+  function handleShowAll() {
+    setSearch({ pathname, query: "", nationality: "" });
   }
 
   let content;
@@ -118,7 +159,10 @@ export default function App() {
                 artPieces={artPieces}
                 artPiecesInfo={artPiecesInfo}
                 onToggleFavorite={handleToggleFavorite}
-                isSearchable
+                isHallway
+                searchQuery={searchQuery}
+                nationality={searchNationality}
+                onShowAll={handleShowAll}
               />
             </>
           }
@@ -142,11 +186,12 @@ export default function App() {
             <>
               <h1>Favorites</h1>
               <ArtPieces
-                artPieces={artPieces.filter((artPiece) =>
-                  isFavorite(artPiecesInfo, artPiece.slug)
-                )}
+                artPieces={favoriteArtPieces}
                 artPiecesInfo={artPiecesInfo}
                 onToggleFavorite={handleToggleFavorite}
+                searchQuery={searchQuery}
+                nationality={searchNationality}
+                onShowAll={handleShowAll}
               />
             </>
           }
@@ -178,7 +223,12 @@ export default function App() {
     <>
       {/* rendered once, outside the routes, so it appears on every page;
           before main, so keyboard and screen readers reach it first like on screen */}
-      <Navigation />
+      <Navigation
+        search={{
+          nationalities: searchNationalities,
+          onSearch: handleSearch,
+        }}
+      />
       <main>{content}</main>
     </>
   );
