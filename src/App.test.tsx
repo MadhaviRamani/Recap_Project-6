@@ -489,6 +489,27 @@ describe("search in the navigation", () => {
     );
   }
 
+  test("filters the Gallery while typing, without Enter", async () => {
+    const user = userEvent.setup();
+    mockFetch({ ok: true, data: artPieces });
+
+    renderApp("/art-pieces");
+    await screen.findAllByRole("listitem");
+    await user.click(screen.getByRole("button", { name: "Open search" }));
+    const input = screen.getByRole("searchbox", { name: "Search art pieces" });
+
+    await user.type(input, "harv");
+
+    expect(screen.getAllByRole("listitem")).toHaveLength(1);
+    expect(screen.getByText(/Results for “harv”/)).toBeInTheDocument();
+
+    // emptying the field shows all art pieces again
+    await user.clear(input);
+
+    expect(screen.getAllByRole("listitem")).toHaveLength(2);
+    expect(screen.queryByText(/Results/)).not.toBeInTheDocument();
+  });
+
   test("filters the Gallery, and changing pages clears the search", async () => {
     const user = userEvent.setup();
     mockFetch({ ok: true, data: artPieces });

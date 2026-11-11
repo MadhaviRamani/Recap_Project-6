@@ -18,8 +18,8 @@ type SearchBarProps = {
 };
 
 // the search in the navigation: at first only the gold magnifying glass;
-// a click opens the search field, the next click closes it; Enter in the
-// field searches; while a search is active, a clear button in the field
+// a click opens the search field, the next click closes it; the search
+// follows every letter typed; while a search is active, a clear button in the field
 // shows all art pieces again
 export default function SearchBar({
   query,
@@ -62,13 +62,19 @@ export default function SearchBar({
     buttonRef.current?.focus();
   }
 
-  // Enter in the field searches; an empty search does nothing; the field
-  // keeps the searched text
+  // the search follows every letter typed; only extra spaces change nothing,
+  // and an emptied field shows all art pieces again
+  function handleChange(nextText: string) {
+    setText(nextText);
+    const nextSearchText = cleanSearchText(nextText);
+    if (nextSearchText !== searchText) {
+      onSearch(nextSearchText);
+    }
+  }
+
+  // the search already runs while typing, so Enter does not reload the page
   function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (isOpen && !isEmpty) {
-      onSearch(searchText);
-    }
   }
 
   function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {
@@ -102,7 +108,7 @@ export default function SearchBar({
           aria-label="Search art pieces"
           value={text}
           placeholder="Name, artist or genre"
-          onChange={(event) => setText(event.target.value)}
+          onChange={(event) => handleChange(event.target.value)}
           onKeyDown={handleKeyDown}
         />
         {query !== "" && (
