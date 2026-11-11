@@ -173,41 +173,6 @@
   border-color: var(--color-nav-gold);
 }
 
-/* the search bar on the Gallery and the Favorites page fills the room
-   between the logo and the links (styled in SearchBar.css) */
-.navigation-inner > .search-bar {
-  margin: 0 auto;
-}
-
-/* on smaller screens the search bar moves to a second row under the logo
-   and the links, full width; the bar grows taller and the page content
-   starts below it, as everything uses --navigation-height */
-@media (max-width: 56rem) {
-  :root:has(.navigation .search-bar) {
-    --navigation-height: 7.25rem;
-  }
-
-  /* only the bar with a search bar wraps; the others stay one row */
-  .navigation-inner:has(> .search-bar) {
-    flex-wrap: wrap;
-    row-gap: 0.5rem;
-    align-content: center;
-  }
-
-  /* 16px text, so phones do not zoom in when a field gets focus */
-  .navigation .search-bar input,
-  .navigation .search-bar select {
-    font-size: 1rem;
-  }
-
-  /* the search stays right after the logo for the Tab key, but is shown
-     after the links */
-  .navigation-inner > .search-bar {
-    flex-basis: 100%;
-    order: 1;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .navigation-logo-mark,
   .navigation-links a,

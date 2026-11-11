@@ -12,14 +12,12 @@ import {
   addComment,
   deleteComment,
   editComment,
-  isFavorite,
   toggleFavorite,
 } from "./utils/artPiecesInfo";
 import {
   loadArtPiecesInfo,
   saveArtPiecesInfo,
 } from "./utils/artPiecesInfoStorage";
-import { getNationalities } from "./utils/artistNationality";
 import "./styles.css";
 
 const API_URL = "https://example-apis.vercel.app/api/art";
@@ -30,8 +28,6 @@ const DEFAULT_PROFILE_NAME = "Art Lover";
 type Search = {
   pathname: string;
   query: string;
-  // "" stands for all nationalities
-  nationality: string;
 };
 
 export async function fetcher(url: string): Promise<ArtPiece[]> {
@@ -60,27 +56,14 @@ export default function App() {
   const [isDarkMode, setIsDarkMode] = useState<boolean>(true);
 
   const { pathname } = useLocation();
-  const [search, setSearch] = useState<Search>({
-    pathname,
-    query: "",
-    nationality: "",
-  });
+  const [search, setSearch] = useState<Search>({ pathname, query: "" });
   // moving to another page clears the search; it is reset while rendering,
   // so the new page never shows the old search first
   if (search.pathname !== pathname) {
-    setSearch({ pathname, query: "", nationality: "" });
+    setSearch({ pathname, query: "" });
   }
   const isSearchOnPage = search.pathname === pathname;
   const searchQuery = isSearchOnPage ? search.query : "";
-  const searchNationality = isSearchOnPage ? search.nationality : "";
-
-  const favoriteArtPieces = (artPieces ?? []).filter((artPiece) =>
-    isFavorite(artPiecesInfo, artPiece.slug)
-  );
-  // the dropdown lists the nationalities of the art pieces on the page
-  const searchNationalities = getNationalities(
-    pathname === "/favorites" ? favoriteArtPieces : (artPieces ?? [])
-  );
 
   useEffect(() => {
     saveArtPiecesInfo(artPiecesInfo);
@@ -116,12 +99,12 @@ export default function App() {
     setArtPiecesInfo((currentInfo) => deleteComment(currentInfo, slug, id));
   }
 
-  function handleSearch(query: string, nationality: string) {
-    setSearch({ pathname, query, nationality });
+  function handleSearch(query: string) {
+    setSearch({ pathname, query });
   }
 
   function handleShowAll() {
-    setSearch({ pathname, query: "", nationality: "" });
+    setSearch({ pathname, query: "" });
   }
 
   let content;
@@ -161,8 +144,6 @@ export default function App() {
                 onToggleFavorite={handleToggleFavorite}
                 isHallway
                 searchQuery={searchQuery}
-                nationality={searchNationality}
-                onShowAll={handleShowAll}
               />
             </>
           }
@@ -193,8 +174,6 @@ export default function App() {
                 onToggleFavorite={handleToggleFavorite}
                 isFavoritesHallway
                 searchQuery={searchQuery}
-                nationality={searchNationality}
-                onShowAll={handleShowAll}
               />
             </>
           }
@@ -228,8 +207,9 @@ export default function App() {
           before main, so keyboard and screen readers reach it first like on screen */}
       <Navigation
         search={{
-          nationalities: searchNationalities,
+          query: searchQuery,
           onSearch: handleSearch,
+          onShowAll: handleShowAll,
         }}
       />
       <main>{content}</main>

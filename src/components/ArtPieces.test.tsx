@@ -161,7 +161,6 @@ describe("favorites hallway", () => {
           onToggleFavorite={vi.fn()}
           isFavoritesHallway
           searchQuery={searchQuery}
-          onShowAll={vi.fn()}
         />
       </MemoryRouter>
     );
@@ -204,12 +203,7 @@ describe("favorites hallway", () => {
 });
 
 describe("search", () => {
-  function renderSearchedArtPieces({
-    isHallway = false,
-    searchQuery = "",
-    nationality = "",
-    onShowAll = vi.fn(),
-  }) {
+  function renderSearchedArtPieces({ isHallway = false, searchQuery = "" }) {
     return render(
       <MemoryRouter>
         <ArtPieces
@@ -218,8 +212,6 @@ describe("search", () => {
           onToggleFavorite={vi.fn()}
           isHallway={isHallway}
           searchQuery={searchQuery}
-          nationality={nationality}
-          onShowAll={onShowAll}
         />
       </MemoryRouter>
     );
@@ -239,44 +231,16 @@ describe("search", () => {
       expect(screen.getByText(/Results for “van gogh”/)).toBeInTheDocument();
     });
 
-    test("shows only the art pieces of the nationality", () => {
-      renderSearchedArtPieces({ isHallway, nationality: "Flemish" });
-
-      expect(screen.getAllByRole("listitem")).toHaveLength(1);
-      expect(
-        screen.getByRole("heading", { name: "The Harvesters" })
-      ).toBeInTheDocument();
-      expect(
-        screen.getByText(/Results from Flemish artists/)
-      ).toBeInTheDocument();
-    });
-
-    test("combines the search text with the nationality", () => {
-      renderSearchedArtPieces({
-        isHallway,
-        searchQuery: "harvesters",
-        nationality: "Dutch",
-      });
+    test("says when nothing matches, without nationality or Show all", () => {
+      renderSearchedArtPieces({ isHallway, searchQuery: "harvesters dutch" });
 
       expect(
-        screen.getByText(/Results for “harvesters” from Dutch artists/)
+        screen.getByText("Results for “harvesters dutch”")
       ).toBeInTheDocument();
       expect(screen.getByText("No art pieces found")).toBeInTheDocument();
       expect(screen.queryAllByRole("listitem")).toHaveLength(0);
-    });
-
-    test("Show all asks to show every art piece again", async () => {
-      const user = userEvent.setup();
-      const onShowAll = vi.fn();
-      renderSearchedArtPieces({
-        isHallway,
-        searchQuery: "Harvesters",
-        onShowAll,
-      });
-
-      await user.click(screen.getByRole("button", { name: "Show all" }));
-
-      expect(onShowAll).toHaveBeenCalledTimes(1);
+      // Show all is the clear button in the search field of the navigation
+      expect(screen.queryByRole("button")).not.toBeInTheDocument();
     });
 
     test("shows all art pieces and no status without a search", () => {

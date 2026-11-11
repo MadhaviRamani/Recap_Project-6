@@ -56,7 +56,7 @@ test("finds art pieces by genre", () => {
 });
 
 test("does not match the nationality as search text", () => {
-  // the nationality is chosen only in the dropdown
+  // the search looks only at name, artist and genre
   expect(searchArtPieces(artPieces, "dutch")).toEqual([]);
 });
 
@@ -104,13 +104,4 @@ test("does not change the art pieces", () => {
   searchArtPieces(artPieces, "dutch");
 
   expect(artPieces).toEqual(original);
-});
-
-test("shows only art pieces of the chosen nationality", () => {
-  expect(searchArtPieces(artPieces, "", "Japanese")).toEqual([greatWave]);
-});
-
-test("combines the search text with the chosen nationality", () => {
-  expect(searchArtPieces(artPieces, "wave", "Japanese")).toEqual([greatWave]);
-  expect(searchArtPieces(artPieces, "wave", "Dutch")).toEqual([]);
 });

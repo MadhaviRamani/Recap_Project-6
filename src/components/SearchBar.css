@@ -1,46 +1,51 @@
-/* the search bar sits in the navigation bar, between the logo and the links,
-   and looks like it in both themes: dark smoky glass fields with ivory text,
-   a fine gold border and a round gold magnifying glass button like the
-   profile icon; color-scheme dark gives the dropdown list dark colors, too */
+/* the search sits in the navigation links, between Favorites and the
+   profile icon: at first only a round gold magnifying glass like the profile
+   icon; a click slides the search field open to its left and the links move
+   aside to make room; dark smoky glass with ivory text in the dark theme,
+   light glass with dark text in the light theme */
 .search-bar {
+  position: relative;
   display: flex;
-  flex: 0 1 28rem;
-  gap: 0.5rem;
   align-items: center;
-  min-width: 0;
   margin: 0;
   color-scheme: dark;
 }
 
-.search-bar input,
-.search-bar select {
-  min-width: 0;
+/* the field stands in the row left of the magnifying glass; closed it is
+   0 wide, open it grows and pushes the links to the left */
+.search-bar-field {
+  position: relative;
+  width: 0;
+  margin-right: 0;
+  overflow: hidden;
+  transition:
+    width 0.3s ease,
+    margin-right 0.3s ease;
+}
+
+.search-bar-open .search-bar-field {
+  width: 14rem;
+  margin-right: 0.5rem;
+}
+
+.search-bar input {
+  width: 100%;
   height: 2.25rem;
-  padding: 0 0.75rem;
+  /* room for the clear button on the right */
+  padding: 0 2.25rem 0 0.875rem;
   font: inherit;
   font-size: 0.875rem;
   color: var(--color-nav-link);
   background: rgb(0 0 0 / 0.32);
-  border: 1px solid color-mix(in srgb, var(--color-nav-gold), transparent 50%);
+  border: 1px solid var(--color-nav-gold);
   border-radius: 999px;
-  /* the fields are set into the glass of the bar */
+  /* the field is set into the glass of the bar */
   box-shadow: inset 0 1px 3px rgb(0 0 0 / 0.35);
-  transition: border-color 0.3s ease;
 }
 
-.search-bar input {
-  flex: 1 1 8rem;
-}
-
-.search-bar select {
-  flex: 0 1 auto;
-  max-width: 11rem;
-}
-
-/* the options of the dropdown list on the dark bar color */
-.search-bar option {
-  color: var(--color-nav-link);
-  background: var(--color-nav-background);
+/* the browser's own clear cross would sit on top of ours */
+.search-bar input::-webkit-search-cancel-button {
+  display: none;
 }
 
 /* at least 4.5:1 on the dark field */
@@ -49,13 +54,8 @@
   opacity: 1;
 }
 
-.search-bar input:hover,
-.search-bar select:hover {
-  border-color: var(--color-nav-gold);
-}
-
 /* the magnifying glass in a round gold button, like the filled profile icon */
-.search-bar button {
+.search-bar-toggle {
   display: grid;
   flex-shrink: 0;
   place-items: center;
@@ -75,57 +75,90 @@
   transition: box-shadow 0.3s ease;
 }
 
-.search-bar button svg {
+.search-bar-toggle svg {
   width: 1.125rem;
   height: 1.125rem;
 }
 
 /* a soft golden glow on hover */
-.search-bar button:hover:not(:disabled) {
+.search-bar-toggle:hover {
   box-shadow: 0 0 0.875rem rgb(220 193 132 / 0.6);
 }
 
-/* without a search text or a nationality there is nothing to search:
-   the button is dimmed, does not glow and shows it cannot be used */
-.search-bar button:disabled {
-  cursor: not-allowed;
-  opacity: 0.5;
-  filter: saturate(0.4);
+/* "Show all art pieces": a small round × inside the field, on the right */
+.search-bar-clear {
+  position: absolute;
+  top: 50%;
+  right: 0.375rem;
+  display: grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0;
+  color: var(--color-nav-gold);
+  cursor: pointer;
+  background: none;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  transform: translateY(-50%);
 }
 
-/* the gold focus ring of the navigation */
+.search-bar-clear:hover {
+  color: var(--color-nav-active);
+}
+
+/* the gold focus ring of the navigation; inside the field it sits inside,
+   so the hidden overflow does not cut it off */
 .search-bar :focus-visible {
   outline: 2px solid var(--color-nav-gold);
   outline-offset: 2px;
 }
 
+.search-bar-field :focus-visible {
+  outline-offset: -3px;
+}
+
+/* 16px text on small screens, so phones do not zoom in on focus */
+@media (max-width: 56rem) {
+  .search-bar input {
+    font-size: 1rem;
+  }
+}
+
+/* narrow screens have no room for the field next to all links: while it is
+   open, the text links step aside (the profile icon stays), and the field
+   takes the room up to the logo */
+@media (max-width: 54rem) {
+  .navigation-links:has(.search-bar-open) > a:not(.navigation-profile) {
+    display: none;
+  }
+
+  .search-bar-open .search-bar-field {
+    width: min(14rem, calc(100vw - 10.5rem));
+  }
+}
+
+/* less motion: the field opens at once */
 @media (prefers-reduced-motion: reduce) {
-  .search-bar input,
-  .search-bar select,
-  .search-bar button {
+  .search-bar-field,
+  .search-bar-toggle {
     transition: none;
   }
 }
 
 /* the gallery in daylight (dark mode off): the navigation bar is light
-   ivory glass, so the fields become light glass with dark text and a dark
-   gold edge (at least 3:1), the dropdown list light, the focus ring dark
-   gold; the gold button stays, with a dark gold edge on the light bar */
+   ivory glass, so the field becomes light with dark text and a dark gold
+   edge (at least 3:1), the clear button and the focus ring dark gold; the
+   gold button stays, with a dark gold edge on the light bar */
 [data-theme="light"] .search-bar {
   color-scheme: light;
 }
 
-[data-theme="light"] .search-bar input,
-[data-theme="light"] .search-bar select {
+[data-theme="light"] .search-bar input {
   color: var(--daylight-text);
   background: rgb(255 255 255 / 0.7);
   border-color: var(--daylight-gold-text);
   box-shadow: inset 0 1px 3px var(--daylight-shadow);
-}
-
-[data-theme="light"] .search-bar option {
-  color: var(--daylight-text);
-  background: var(--daylight-glass-solid);
 }
 
 /* about 5.5:1 on the light field */
@@ -133,13 +166,16 @@
   color: #6e6253;
 }
 
-[data-theme="light"] .search-bar input:hover,
-[data-theme="light"] .search-bar select:hover {
-  border-color: var(--daylight-text);
+[data-theme="light"] .search-bar-toggle {
+  border-color: var(--daylight-gold-text);
 }
 
-[data-theme="light"] .search-bar button {
-  border-color: var(--daylight-gold-text);
+[data-theme="light"] .search-bar-clear {
+  color: var(--daylight-gold-text);
+}
+
+[data-theme="light"] .search-bar-clear:hover {
+  color: var(--daylight-text);
 }
 
 [data-theme="light"] .search-bar :focus-visible {
@@ -176,23 +212,6 @@
     inset 0 1px 0 var(--color-search-sheen),
     inset 0 -1px 0 rgb(0 0 0 / 0.15),
     0 1rem 2rem rgb(0 0 0 / 0.45);
-}
-
-.search-status button {
-  padding: 0.125rem 0.75rem;
-  font: inherit;
-  color: inherit;
-  cursor: pointer;
-  background: none;
-  border: 1px solid var(--color-search-border);
-  border-radius: 999px;
-}
-
-/* the focus ring in the text color: dark on the light panel, ivory on the
-   dark panel */
-.search-status :focus-visible {
-  outline: 2px solid var(--color-search-text);
-  outline-offset: 2px;
 }
 
 /* above the favorites list the panels stand on the page, without a
