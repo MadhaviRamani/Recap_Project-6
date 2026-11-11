@@ -141,16 +141,6 @@ main {
   margin: 0.25rem 0 0;
 }
 
-.details {
-  position: relative;
-}
-
-.details img {
-  width: 100%;
-  max-height: 32rem;
-  object-fit: contain;
-}
-
 .palette {
   display: flex;
   flex-wrap: wrap;
@@ -221,6 +211,11 @@ main {
 .palette-swatch:focus-within :is(.palette-code, .palette-similar),
 .palette-swatch.copied .palette-code {
   opacity: 1;
+}
+
+/* the Similar button shows an icon of two overlapping picture frames */
+.palette-similar svg {
+  display: block;
 }
 
 .palette-code:hover,

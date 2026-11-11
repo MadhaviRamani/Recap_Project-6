@@ -1,0 +1,489 @@
+/* on the details page the viewing room fills the whole page under the
+   navigation bar, from edge to edge */
+main:has(.details-room) {
+  max-width: none;
+  padding: var(--navigation-height) 0 0;
+}
+
+/* the details page: a private viewing room of the royal gallery, dark and
+   warmly lit in both themes like the Spotlight stage and the hallway; the
+   art piece hangs in its golden frame under a brass lamp, with a museum
+   placard next to it, its colors and a guest book below */
+.details-room {
+  /* the warm light of the lamp */
+  --lamp-light: 248 226 182;
+  /* the gold tones of the frame, from shadow to highlight */
+  --frame-gold-dark: #6b4f1d;
+  --frame-gold: #a8843f;
+  --frame-gold-light: var(--color-nav-gold);
+  --frame-gold-shine: #f1e2b8;
+  /* the smoky glass of the panels and buttons, edged with a fine gold line */
+  --glass: rgb(18 15 11 / 0.72);
+  --glass-solid: #1b1610;
+  --glass-border: rgb(220 193 132 / 0.5);
+  --ivory: #f5efe2;
+  --ink: #241d15;
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(16rem, 2fr);
+  grid-template-areas:
+    "artwork placard"
+    "palette palette"
+    "guestbook guestbook"
+    "back back";
+  gap: 2rem 3rem;
+  align-items: center;
+  min-height: calc(100dvh - var(--navigation-height));
+  padding: 1.5rem max(1.5rem, calc((100% - 72rem) / 2)) 3rem;
+  color: var(--ivory);
+  /* a warm, softly lit wall: bright where the lamp shines on the frame,
+     with a soft shadow at the edges */
+  background:
+    radial-gradient(ellipse 55% 50% at 32% 18%, #6b5536, transparent 75%),
+    radial-gradient(ellipse 60% 40% at 70% 30%, #3d3122, transparent 80%),
+    linear-gradient(#2b231a, #1f1a14 60%, #191510);
+  box-shadow: inset 0 0 8rem rgb(0 0 0 / 0.45);
+}
+
+/* the not-found room has only the back button and the placard */
+.details-room:not(:has(.details-artwork)) {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    "placard"
+    "back";
+  align-content: start;
+}
+
+/* "Back to gallery": a small smoky glass pill with a fine gold edge,
+   at the end of the room under the guest book */
+.details-back {
+  grid-area: back;
+  justify-self: start;
+  display: inline-flex;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.5rem 1.125rem;
+  font: inherit;
+  font-size: 0.8125rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ivory);
+  cursor: pointer;
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  backdrop-filter: blur(8px);
+}
+
+.details-back:hover {
+  border-color: var(--frame-gold-light);
+  box-shadow: 0 0 1rem rgb(var(--lamp-light) / 0.3);
+}
+
+/* the art piece with its lamp above it */
+.details-artwork {
+  grid-area: artwork;
+  position: relative;
+  justify-self: center;
+  max-width: 100%;
+  padding-top: 3.5rem;
+}
+
+/* the brass picture lamp on a short arm above the frame */
+.details-lamp {
+  position: absolute;
+  top: 0.75rem;
+  left: 50%;
+  z-index: 2;
+  width: 8rem;
+  height: 1rem;
+  transform: translateX(-50%);
+  background: linear-gradient(
+    var(--frame-gold-shine),
+    var(--frame-gold-light) 35%,
+    var(--frame-gold) 65%,
+    var(--frame-gold-dark)
+  );
+  border-radius: 0.5rem 0.5rem 1rem 1rem;
+  box-shadow:
+    0 0.125rem 0.25rem rgb(0 0 0 / 0.6),
+    0 0.5rem 1.25rem rgb(var(--lamp-light) / 0.55);
+}
+
+.details-lamp::before {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  width: 0.25rem;
+  height: 0.75rem;
+  transform: translateX(-50%);
+  background: var(--frame-gold-dark);
+}
+
+/* the bulb glowing under the lamp shade */
+.details-lamp::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 10%;
+  width: 80%;
+  height: 0.25rem;
+  background: rgb(var(--lamp-light));
+  border-radius: 50%;
+  filter: blur(2px);
+}
+
+/* the warm light of the lamp falls down onto the frame and fades out */
+.details-light {
+  position: absolute;
+  top: 1.75rem;
+  left: 50%;
+  z-index: 1;
+  width: 130%;
+  height: 80%;
+  transform: translateX(-50%);
+  clip-path: polygon(40% 0, 60% 0, 100% 100%, 0 100%);
+  background: linear-gradient(
+    rgb(var(--lamp-light) / 0.4),
+    rgb(var(--lamp-light) / 0.1) 70%,
+    transparent
+  );
+  filter: blur(8px);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  animation: details-lamp-glow 4s ease-in-out infinite alternate;
+}
+
+@keyframes details-lamp-glow {
+  from {
+    opacity: 0.8;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.details-frame {
+  position: relative;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+/* the royal golden frame: the image sits on a linen mat inside a wide
+   gilded frame with carved edges; the whole image is shown */
+.details-frame img {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: min(70dvh, 36rem);
+  object-fit: contain;
+  padding: 1rem;
+  border: 1.5rem solid transparent;
+  background:
+    linear-gradient(#efe9dc, #efe9dc) padding-box,
+    /* the light of the lamp from above */
+    linear-gradient(
+        180deg,
+        rgb(255 244 214 / 0.35),
+        transparent 35%,
+        transparent 65%,
+        rgb(0 0 0 / 0.35)
+      )
+      border-box,
+    /* the gilt */
+    linear-gradient(
+        135deg,
+        var(--frame-gold-dark),
+        var(--frame-gold) 22%,
+        var(--frame-gold-light) 42%,
+        var(--frame-gold) 58%,
+        var(--frame-gold-dark) 100%
+      )
+      border-box;
+  outline: 1px solid #2e2008;
+  box-shadow:
+    0 0 0 2px var(--frame-gold-dark),
+    0 0 0 3px var(--frame-gold-shine),
+    0 2.5rem 3rem -0.5rem rgb(0 0 0 / 0.85),
+    0 0 5rem rgb(var(--lamp-light) / 0.2);
+}
+
+/* the favorite button sits on the top right corner of the frame */
+.details-frame .favorite-button {
+  top: -1rem;
+  right: -1rem;
+  z-index: 3;
+  color: var(--ivory);
+  background: rgb(18 15 11 / 0.85);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 0.25rem 0.75rem rgb(0 0 0 / 0.5);
+}
+
+.details-frame .favorite-button[aria-pressed="true"] {
+  color: var(--frame-gold-light);
+  border-color: var(--frame-gold-light);
+}
+
+/* the glass of the placard and the panels */
+.details-placard,
+.details-panel {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: 0.125rem;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 1rem 2rem rgb(0 0 0 / 0.45);
+}
+
+/* the museum placard with the name, the artist, the year and the genre */
+.details-placard {
+  grid-area: placard;
+  padding: 1.75rem 2rem;
+}
+
+.details-placard h1 {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.75rem, 3vw, 2.375rem);
+  font-weight: 400;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.details-artist {
+  margin: 0.75rem 0 0;
+  font-size: 0.875rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--frame-gold-light);
+}
+
+/* the short gold line under the artist */
+.details-artist::after {
+  content: "";
+  display: block;
+  width: 3rem;
+  height: 1px;
+  margin-top: 1.25rem;
+  background: var(--frame-gold);
+}
+
+.details-placard dl {
+  display: grid;
+  gap: 0.75rem;
+  margin: 1.25rem 0 0;
+}
+
+.details-placard dt {
+  font-size: 0.6875rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--frame-gold-light);
+}
+
+.details-placard dd {
+  margin: 0.125rem 0 0;
+}
+
+/* the color palette and the guest book: glass panels over the full width */
+.details-panel {
+  grid-area: palette;
+  padding: 1.5rem 2rem;
+}
+
+.details-guestbook {
+  grid-area: guestbook;
+}
+
+/* the gold headings of the panels */
+.details-room h2,
+.details-room h3 {
+  margin: 0 0 0.75rem;
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 400;
+  color: var(--frame-gold-light);
+}
+
+.details-room h2 {
+  font-size: 1.375rem;
+}
+
+.details-room h3 {
+  font-size: 1.0625rem;
+}
+
+/* the color circles get a thin gold ring */
+.details-room .palette-swatch {
+  border: 2px solid var(--frame-gold-light);
+}
+
+.details-room .palette-swatch:has(.palette-similar[aria-pressed="true"]) {
+  outline-color: var(--frame-gold-shine);
+}
+
+/* the similar art pieces: small golden-framed thumbnails */
+.details-room .similar-art {
+  grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+  gap: 1.25rem;
+}
+
+.details-room .similar-art a {
+  color: var(--ivory);
+}
+
+.details-room .similar-art img {
+  height: 7rem;
+  border: 0.375rem solid var(--frame-gold);
+  border-radius: 0;
+  box-shadow:
+    0 0 0 1px var(--frame-gold-dark),
+    0 0.5rem 1rem rgb(0 0 0 / 0.5);
+}
+
+.details-room .similar-art span {
+  display: block;
+  margin-top: 0.5rem;
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.details-room .similar-art a:hover span {
+  color: var(--frame-gold-shine);
+}
+
+/* the guest book: every comment is a glass card */
+.details-room .comments {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0 0 1.5rem;
+}
+
+.details-room .comments li {
+  padding: 1rem 1.25rem;
+  background: rgb(255 250 240 / 0.06);
+  border: 1px solid rgb(220 193 132 / 0.3);
+  border-radius: 0.125rem;
+}
+
+.details-room .comments time {
+  margin-bottom: 0.75rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--frame-gold-light);
+}
+
+.details-room .comments p {
+  margin: 0 0 0.5rem;
+  overflow-wrap: anywhere;
+}
+
+/* Edit, Save, Cancel and Delete: glass buttons with a gold edge */
+.details-room .comments button,
+.details-room .comment-form button {
+  margin-right: 0.5rem;
+  padding: 0.375rem 1rem;
+  font: inherit;
+  font-size: 0.8125rem;
+  color: var(--ivory);
+  cursor: pointer;
+  background: rgb(18 15 11 / 0.6);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+}
+
+.details-room .comments button:hover,
+.details-room .comment-form button:hover {
+  border-color: var(--frame-gold-light);
+}
+
+/* the comment form: an ivory field with a gold edge and a gold button */
+.details-room .comment-form {
+  max-width: 32rem;
+}
+
+.details-room .comment-form label {
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--frame-gold-light);
+}
+
+.details-room .comment-form textarea {
+  min-height: 5rem;
+  padding: 0.75rem;
+  font: inherit;
+  color: var(--ink);
+  background: var(--ivory);
+  border: 1px solid var(--frame-gold);
+  border-radius: 0.125rem;
+}
+
+.details-room .comment-form button[type="submit"] {
+  justify-self: start;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: linear-gradient(
+    145deg,
+    var(--frame-gold-shine),
+    var(--frame-gold-light) 45%,
+    var(--frame-gold)
+  );
+  border-color: var(--frame-gold);
+}
+
+.details-room .comment-form button[type="submit"]:hover {
+  box-shadow: 0 0 1rem rgb(var(--lamp-light) / 0.45);
+}
+
+/* the keyboard focus shows a gold ring */
+.details-room a:focus-visible,
+.details-room button:focus-visible,
+.details-room textarea:focus-visible {
+  outline: 3px solid var(--frame-gold-shine);
+  outline-offset: 3px;
+}
+
+/* without frosted glass support, the glass gets a solid color instead */
+@supports not (backdrop-filter: blur(1px)) {
+  .details-back,
+  .details-placard,
+  .details-panel {
+    background: var(--glass-solid);
+  }
+}
+
+/* small screens: frame, placard, palette and guest book in one column */
+@media (max-width: 48rem) {
+  .details-room {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "artwork"
+      "placard"
+      "palette"
+      "guestbook"
+      "back";
+    gap: 1.5rem;
+    padding: 1rem 1rem 2rem;
+  }
+
+  .details-frame img {
+    max-height: 55dvh;
+    padding: 0.625rem;
+    border-width: 1rem;
+  }
+
+  .details-placard,
+  .details-panel {
+    padding: 1.25rem;
+  }
+}
+
+/* less motion: the lamp shines steadily */
+@media (prefers-reduced-motion: reduce) {
+  .details-light {
+    animation: none;
+  }
+}

@@ -263,3 +263,93 @@ test("opening a similar art piece shows its own palette without old results", as
     screen.queryByRole("heading", { name: /Art pieces with a color similar/ })
   ).not.toBeInTheDocument();
 });
+
+describe("viewing room", () => {
+  function getRoom() {
+    return document.querySelector(".details-room");
+  }
+
+  test("hangs the image in the golden frame, with the favorite button on it", () => {
+    renderDetails("/art-pieces/the-harvesters");
+
+    const artwork = getRoom()?.querySelector(".details-artwork");
+    const frame = artwork?.querySelector(".details-frame");
+    expect(frame).toContainElement(
+      screen.getByRole("img", {
+        name: "The Harvesters by Pieter Bruegel the Elder",
+      })
+    );
+    expect(frame).toContainElement(
+      screen.getByRole("button", { name: "Favorite" })
+    );
+  });
+
+  test("hangs the frame under a decorative lamp and its light", () => {
+    renderDetails("/art-pieces/the-harvesters");
+
+    const artwork = getRoom()?.querySelector(".details-artwork");
+    for (const decoration of artwork?.querySelectorAll(
+      ".details-lamp, .details-light"
+    ) ?? []) {
+      expect(decoration).toHaveAttribute("aria-hidden", "true");
+      expect(decoration).toBeEmptyDOMElement();
+    }
+    expect(artwork?.querySelectorAll(".details-lamp")).toHaveLength(1);
+    expect(artwork?.querySelectorAll(".details-light")).toHaveLength(1);
+  });
+
+  test("the placard shows the name, the artist, the year and the genre", () => {
+    renderDetails("/art-pieces/the-harvesters");
+
+    const placard = getRoom()?.querySelector(".details-placard");
+    expect(placard).not.toBeNull();
+    const inPlacard = within(placard as HTMLElement);
+    expect(
+      inPlacard.getByRole("heading", { level: 1, name: "The Harvesters" })
+    ).toBeInTheDocument();
+    expect(inPlacard.getByText("Pieter Bruegel the Elder")).toHaveClass(
+      "details-artist"
+    );
+    expect(inPlacard.getByText("Year")).toBeInTheDocument();
+    expect(inPlacard.getByText("1565")).toBeInTheDocument();
+    expect(inPlacard.getByText("Genre")).toBeInTheDocument();
+    expect(inPlacard.getByText("Genre Painting")).toBeInTheDocument();
+  });
+
+  test("the palette and the guest book lie in their glass panels", () => {
+    renderDetails("/art-pieces/the-harvesters");
+
+    const panels = getRoom()?.querySelectorAll(".details-panel") ?? [];
+    expect(panels).toHaveLength(2);
+    expect(panels[0]).toContainElement(
+      screen.getByRole("heading", { name: "Color palette" })
+    );
+    expect(panels[1]).toHaveClass("details-guestbook");
+    expect(panels[1]).toContainElement(
+      screen.getByRole("heading", { name: "Comments" })
+    );
+    expect(panels[1]).toContainElement(screen.getByLabelText("Add comment"));
+  });
+
+  test("the back button comes last, under the guest book; the arrow is decoration", () => {
+    renderDetails("/art-pieces/the-harvesters");
+
+    const back = screen.getByRole("button", { name: "Back to gallery" });
+    expect(getRoom()?.lastElementChild).toBe(back);
+    expect(
+      getRoom()
+        ?.querySelector(".details-guestbook")
+        ?.compareDocumentPosition(back)
+    ).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    expect(back.querySelector('[aria-hidden="true"]')).toHaveTextContent("←");
+  });
+
+  test("Art piece not found is shown in the room", () => {
+    renderDetails("/art-pieces/unknown");
+
+    expect(getRoom()).toContainElement(
+      screen.getByRole("heading", { name: "Art piece not found" })
+    );
+    expect(getRoom()?.querySelector(".details-artwork")).toBeNull();
+  });
+});
