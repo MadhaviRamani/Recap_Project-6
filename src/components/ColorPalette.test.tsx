@@ -93,7 +93,7 @@ test("shows one list item per color", () => {
   expect(within(palette).getAllByRole("listitem")).toHaveLength(3);
 });
 
-test("shows each color as a circle with its code and a Similar button inside", () => {
+test("shows each color as a circle with its code and a Similar button with an icon inside", () => {
   renderPalette();
 
   for (const color of colors) {
@@ -103,11 +103,16 @@ test("shows each color as a circle with its code and a Similar button inside", (
     expect(circle).toHaveClass("palette-swatch");
     expect(circle).toHaveStyle({ backgroundColor: color });
     expect(copyButton).toHaveTextContent(color);
-    expect(
-      within(circle).getByRole("button", {
-        name: `Find art pieces with a color similar to ${color}`,
-      })
-    ).toHaveTextContent("Similar");
+    const similarButton = within(circle).getByRole("button", {
+      name: `Find art pieces with a color similar to ${color}`,
+    });
+    // an icon instead of the word; the label names the button
+    expect(similarButton).toHaveTextContent("");
+    expect(similarButton).toHaveAttribute("title", "Similar colors");
+    expect(similarButton.querySelector("svg")).toHaveAttribute(
+      "aria-hidden",
+      "true"
+    );
   }
 });
 
@@ -207,6 +212,28 @@ test("shows a message when no other art piece has a similar color", () => {
   expect(
     screen.getByText("No art pieces with a similar color")
   ).toBeInTheDocument();
+  expect(screen.queryByRole("link")).not.toBeInTheDocument();
+});
+
+test("a second click on the same Similar button hides the similar art pieces", () => {
+  renderPalette();
+  const similarButton = screen.getByRole("button", {
+    name: "Find art pieces with a color similar to #8D7332",
+  });
+
+  fireEvent.click(similarButton);
+  expect(similarButton).toHaveAttribute("aria-pressed", "true");
+  expect(
+    screen.getByRole("heading", {
+      name: "Art pieces with a color similar to #8D7332",
+    })
+  ).toBeInTheDocument();
+
+  fireEvent.click(similarButton);
+  expect(similarButton).toHaveAttribute("aria-pressed", "false");
+  expect(
+    screen.queryByRole("heading", { name: /Art pieces with a color similar/ })
+  ).not.toBeInTheDocument();
   expect(screen.queryByRole("link")).not.toBeInTheDocument();
 });
 

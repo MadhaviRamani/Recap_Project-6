@@ -96,9 +96,28 @@ export default function ColorPalette({
                 className="palette-similar"
                 aria-label={`Find art pieces with a color similar to ${color}`}
                 aria-pressed={similarToColor === color}
-                onClick={() => setSimilarToColor(color)}
+                title="Similar colors"
+                // a second click on the same color hides the similar art pieces
+                onClick={() =>
+                  setSimilarToColor(similarToColor === color ? null : color)
+                }
               >
-                Similar
+                {/* two overlapping picture frames; the label names the button */}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <rect x="8" y="3" width="13" height="13" rx="1" />
+                  <path d="M16 20H4a1 1 0 0 1-1-1V8" />
+                </svg>
               </button>
             </li>
           );
