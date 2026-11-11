@@ -325,6 +325,26 @@ test("the profile name can be changed and stays when changing pages", async () =
   expect(screen.getByRole("heading", { name: "Ada" })).toBeInTheDocument();
 });
 
+test("the changed profile name stays after a reload", async () => {
+  const user = userEvent.setup();
+  mockFetch({ ok: true, data: artPieces });
+
+  renderApp("/profile");
+  await user.click(await screen.findByRole("button", { name: "Edit name" }));
+  const input = screen.getByLabelText("Profile name");
+  await user.clear(input);
+  await user.type(input, "Ada");
+  await user.click(screen.getByRole("button", { name: "Save" }));
+
+  // a reload starts the app again with a fresh state
+  cleanup();
+  renderApp("/profile");
+
+  expect(
+    await screen.findByRole("heading", { name: "Ada" })
+  ).toBeInTheDocument();
+});
+
 test("the Profile page shows the loading state while the art pieces are fetched", async () => {
   mockFetch({ ok: true, data: artPieces });
 
@@ -371,6 +391,23 @@ test("the Dark mode switch changes the theme of the whole app", async () => {
   // turning it on again brings the dark gallery back
   await user.click(screen.getByRole("switch", { name: "Dark mode" }));
   expect(document.documentElement).toHaveAttribute("data-theme", "dark");
+});
+
+test("dark mode turned off stays off after a reload", async () => {
+  const user = userEvent.setup();
+  mockFetch({ ok: true, data: artPieces });
+
+  renderApp("/profile");
+  await user.click(await screen.findByRole("switch", { name: "Dark mode" }));
+
+  // a reload starts the app again with a fresh state
+  cleanup();
+  renderApp("/profile");
+
+  expect(
+    await screen.findByRole("switch", { name: "Dark mode" })
+  ).toHaveAttribute("aria-checked", "false");
+  expect(document.documentElement).toHaveAttribute("data-theme", "light");
 });
 
 test("a comment can be added, edited and deleted on one art piece only", async () => {

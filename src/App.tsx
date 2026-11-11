@@ -18,6 +18,12 @@ import {
   loadArtPiecesInfo,
   saveArtPiecesInfo,
 } from "./utils/artPiecesInfoStorage";
+import {
+  loadIsDarkMode,
+  loadProfileName,
+  saveIsDarkMode,
+  saveProfileName,
+} from "./utils/profileStorage";
 import "./styles.css";
 
 const API_URL = "https://example-apis.vercel.app/api/art";
@@ -51,9 +57,13 @@ export default function App() {
   const [artPiecesInfo, setArtPiecesInfo] =
     useState<ArtPieceInfo[]>(loadArtPiecesInfo);
 
-  const [profileName, setProfileName] = useState<string>(DEFAULT_PROFILE_NAME);
-  // the app starts in the dark theme, the look of the royal gallery
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(true);
+  // read from the local storage once, when the state is created
+  const [profileName, setProfileName] = useState<string>(() =>
+    loadProfileName(DEFAULT_PROFILE_NAME)
+  );
+  // the app starts in the dark theme, the look of the royal gallery,
+  // unless dark mode was turned off before
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(loadIsDarkMode);
 
   const { pathname } = useLocation();
   const [search, setSearch] = useState<Search>({ pathname, query: "" });
@@ -69,9 +79,14 @@ export default function App() {
     saveArtPiecesInfo(artPiecesInfo);
   }, [artPiecesInfo]);
 
+  useEffect(() => {
+    saveProfileName(profileName);
+  }, [profileName]);
+
   // the theme is set on <html>, so it applies to the whole app, also the navigation
   useEffect(() => {
     document.documentElement.dataset.theme = isDarkMode ? "dark" : "light";
+    saveIsDarkMode(isDarkMode);
   }, [isDarkMode]);
 
   function handleToggleDarkMode() {
