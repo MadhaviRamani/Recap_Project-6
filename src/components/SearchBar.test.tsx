@@ -69,22 +69,55 @@ test("a click on the magnifying glass opens the field and focuses it", async () 
   expect(onSearch).not.toHaveBeenCalled();
 });
 
-test("Enter searches with the text without extra spaces and keeps it", async () => {
+test("searches with every letter typed, without extra spaces, and keeps the text", async () => {
   const { user, onSearch } = renderSearchBar();
   const input = await openSearch(user);
 
-  await user.type(input, "  great \t  wave {Enter}");
+  await user.type(input, "wa");
 
-  expect(onSearch).toHaveBeenCalledTimes(1);
-  expect(onSearch).toHaveBeenCalledWith("great wave");
+  expect(onSearch).toHaveBeenNthCalledWith(1, "w");
+  expect(onSearch).toHaveBeenNthCalledWith(2, "wa");
+
+  // extra spaces do not search again
+  await user.clear(input);
+  onSearch.mockClear();
+  await user.type(input, "  great \t  wave ");
+
+  expect(onSearch).toHaveBeenLastCalledWith("great wave");
+  expect(onSearch).not.toHaveBeenCalledWith("");
+  // g, gr, gre, grea, great, great w, great wa, great wav, great wave
+  expect(onSearch).toHaveBeenCalledTimes(9);
   expect(input).toHaveValue("  great \t  wave ");
   expect(getToggle("Close search")).toHaveAttribute("aria-expanded", "true");
 });
 
-test("a second click on the magnifying glass closes the field without searching", async () => {
+test("Enter does not search again", async () => {
   const { user, onSearch } = renderSearchBar();
   const input = await openSearch(user);
   await user.type(input, "wave");
+  onSearch.mockClear();
+
+  await user.type(input, "{Enter}");
+
+  expect(onSearch).not.toHaveBeenCalled();
+  expect(input).toHaveValue("wave");
+});
+
+test("emptying the field shows all art pieces again", async () => {
+  const { user, onSearch } = renderSearchBar();
+  const input = await openSearch(user);
+  await user.type(input, "w");
+
+  await user.type(input, "{Backspace}");
+
+  expect(onSearch).toHaveBeenLastCalledWith("");
+});
+
+test("a second click on the magnifying glass closes the field without searching again", async () => {
+  const { user, onSearch } = renderSearchBar();
+  const input = await openSearch(user);
+  await user.type(input, "wave");
+  onSearch.mockClear();
 
   await user.click(getToggle("Close search"));
 
