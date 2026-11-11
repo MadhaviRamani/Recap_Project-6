@@ -284,7 +284,8 @@ test("the Profile page shows the counts and updates the favorites count", async 
   renderApp("/profile");
 
   expect(
-    await screen.findByRole("heading", { level: 1, name: "Profile" })
+    // the Profile page is the curator's office
+    await screen.findByRole("heading", { level: 1, name: "Curator's Office" })
   ).toBeInTheDocument();
   expect(
     screen.getByRole("heading", { name: "Art Lover" })

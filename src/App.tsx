@@ -203,7 +203,7 @@ export default function App() {
           path="/profile"
           element={
             <>
-              <h1>Profile</h1>
+              <h1>Curator&apos;s Office</h1>
               <Profile
                 profileName={profileName}
                 artPieces={artPieces}

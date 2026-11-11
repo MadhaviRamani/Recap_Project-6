@@ -201,3 +201,32 @@ test("clicking the Dark mode switch calls the toggle handler", async () => {
 
   expect(onToggleDarkMode).toHaveBeenCalledTimes(1);
 });
+
+test("the office shows the name on a brass nameplate and the counts on two plaques", () => {
+  renderProfile();
+
+  const nameplate = document.querySelector(".office-nameplate");
+  expect(nameplate).toContainElement(
+    screen.getByRole("heading", { name: "Art Lover" })
+  );
+  const plaques = document.querySelectorAll(".office-plaque");
+  expect(plaques).toHaveLength(2);
+  // the big number and the label are for the eyes, the hidden text for
+  // screen readers
+  expect(plaques[0]).toContainElement(screen.getByText("Art pieces: 3"));
+  const count = plaques[0].querySelector(".office-plaque-count");
+  expect(count).toHaveTextContent("3");
+  expect(count).toHaveAttribute("aria-hidden", "true");
+  expect(plaques[1]).toContainElement(screen.getByText("Favorites: 2"));
+  expect(plaques[1].querySelector(".office-plaque-label")).toHaveTextContent(
+    "Favorites"
+  );
+});
+
+test("the settings sit in a glass panel of the office", () => {
+  renderProfile();
+
+  expect(
+    screen.getByRole("heading", { name: "Settings" }).closest(".office-panel")
+  ).not.toBeNull();
+});
