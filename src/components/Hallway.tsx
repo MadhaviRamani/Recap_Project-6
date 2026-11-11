@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 import type { ArtPiece, ArtPieceInfo } from "../types";
 import { isFavorite } from "../utils/artPiecesInfo";
@@ -31,16 +31,26 @@ function Wall({
     <div className={`hallway-wall hallway-wall-${side}`}>
       {artPieces.length > 0 && (
         <ul className="hallway-wall-list" aria-label={label}>
-          {artPieces.map((artPiece) => (
-            <li key={artPiece.slug} className="hallway-item">
-              {/* the royal lamp and its light are only decoration */}
-              <span className="hallway-lamp" aria-hidden="true" />
-              <span className="hallway-light" aria-hidden="true" />
-              <ArtPiecePreview
-                artPiece={artPiece}
-                isFavorite={isFavorite(artPiecesInfo, artPiece.slug)}
-                onToggleFavorite={onToggleFavorite}
-              />
+          {artPieces.map((artPiece, index) => (
+            <li
+              key={artPiece.slug}
+              className="hallway-item"
+              // the place on the wall, 1 = near the viewer; art pieces
+              // further back hang bigger and grow more on hover
+              style={{ "--hallway-place": index + 1 } as CSSProperties}
+            >
+              {/* only this part turns and grows; the list item stays on
+                  the wall, so the mouse does not lose it */}
+              <div className="hallway-item-art">
+                {/* the royal lamp and its light are only decoration */}
+                <span className="hallway-lamp" aria-hidden="true" />
+                <span className="hallway-light" aria-hidden="true" />
+                <ArtPiecePreview
+                  artPiece={artPiece}
+                  isFavorite={isFavorite(artPiecesInfo, artPiece.slug)}
+                  onToggleFavorite={onToggleFavorite}
+                />
+              </div>
             </li>
           ))}
         </ul>
