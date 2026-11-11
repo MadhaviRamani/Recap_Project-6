@@ -43,6 +43,24 @@
   --color-search-border: #a8843f;
   /* the carpet runner down the middle of the hallway floor */
   --color-runway: #7a2430;
+  /* the gallery in daylight: the light look of the gallery pages
+     (Spotlight, hallway, details room, office, navigation) when dark mode
+     is off; the pages use these in their [data-theme="light"] blocks */
+  --daylight-wall: #f3ece0;
+  --daylight-wall-deep: #e4d7c1;
+  --daylight-floor: #d9c3a0;
+  --daylight-floor-dark: #b99a6c;
+  /* the warm sunlight, as "r g b" for rgb(var(--daylight-sun) / alpha) */
+  --daylight-sun: 255 246 224;
+  /* text on the light walls and the light glass: dark brown (about 14:1)
+     and a dark gold (about 5.5:1 or more) */
+  --daylight-text: #2b2118;
+  --daylight-gold-text: #7a5a1c;
+  /* light frosted glass with a fine dark gold edge */
+  --daylight-glass: rgb(255 251 243 / 0.82);
+  --daylight-glass-solid: #fffbf3;
+  --daylight-glass-border: rgb(122 90 28 / 0.45);
+  --daylight-shadow: rgb(80 60 30 / 0.18);
 }
 
 /* hidden on screen but still read by screen readers */

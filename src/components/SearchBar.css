@@ -107,6 +107,45 @@
   }
 }
 
+/* the gallery in daylight (dark mode off): the navigation bar is light
+   ivory glass, so the fields become light glass with dark text and a dark
+   gold edge (at least 3:1), the dropdown list light, the focus ring dark
+   gold; the gold button stays, with a dark gold edge on the light bar */
+[data-theme="light"] .search-bar {
+  color-scheme: light;
+}
+
+[data-theme="light"] .search-bar input,
+[data-theme="light"] .search-bar select {
+  color: var(--daylight-text);
+  background: rgb(255 255 255 / 0.7);
+  border-color: var(--daylight-gold-text);
+  box-shadow: inset 0 1px 3px var(--daylight-shadow);
+}
+
+[data-theme="light"] .search-bar option {
+  color: var(--daylight-text);
+  background: var(--daylight-glass-solid);
+}
+
+/* about 5.5:1 on the light field */
+[data-theme="light"] .search-bar input::placeholder {
+  color: #6e6253;
+}
+
+[data-theme="light"] .search-bar input:hover,
+[data-theme="light"] .search-bar select:hover {
+  border-color: var(--daylight-text);
+}
+
+[data-theme="light"] .search-bar button {
+  border-color: var(--daylight-gold-text);
+}
+
+[data-theme="light"] .search-bar :focus-visible {
+  outline-color: var(--daylight-gold-text);
+}
+
 /* "Results for …" and "No art pieces found": small panels of frosted glass
    with a fine gold edge, on the runway of the gallery hallway and above the
    favorites list; light in the light theme and smoky dark in the dark theme

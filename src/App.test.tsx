@@ -334,15 +334,15 @@ test("the Profile page shows the loading state while the art pieces are fetched"
   expect(await screen.findByText("Art pieces: 2")).toBeInTheDocument();
 });
 
-test("the app starts in the light theme", async () => {
+test("the app starts in the dark theme with the Dark mode switch on", async () => {
   mockFetch({ ok: true, data: artPieces });
 
   renderApp("/profile");
 
-  expect(document.documentElement).toHaveAttribute("data-theme", "light");
+  expect(document.documentElement).toHaveAttribute("data-theme", "dark");
   expect(
     await screen.findByRole("switch", { name: "Dark mode" })
-  ).toHaveAttribute("aria-checked", "false");
+  ).toHaveAttribute("aria-checked", "true");
 });
 
 test("the Dark mode switch changes the theme of the whole app", async () => {
@@ -350,26 +350,27 @@ test("the Dark mode switch changes the theme of the whole app", async () => {
   mockFetch({ ok: true, data: artPieces });
 
   renderApp("/profile");
+  // turning it off makes every page a light gallery
   await user.click(await screen.findByRole("switch", { name: "Dark mode" }));
 
-  expect(document.documentElement).toHaveAttribute("data-theme", "dark");
+  expect(document.documentElement).toHaveAttribute("data-theme", "light");
   expect(screen.getByRole("switch", { name: "Dark mode" })).toHaveAttribute(
     "aria-checked",
-    "true"
+    "false"
   );
 
   // the theme stays when navigating between pages
   await user.click(screen.getByRole("link", { name: "Gallery" }));
-  expect(document.documentElement).toHaveAttribute("data-theme", "dark");
+  expect(document.documentElement).toHaveAttribute("data-theme", "light");
   await user.click(screen.getByRole("link", { name: "Profile" }));
   expect(screen.getByRole("switch", { name: "Dark mode" })).toHaveAttribute(
     "aria-checked",
-    "true"
+    "false"
   );
 
-  // turning it off goes back to the light theme
+  // turning it on again brings the dark gallery back
   await user.click(screen.getByRole("switch", { name: "Dark mode" }));
-  expect(document.documentElement).toHaveAttribute("data-theme", "light");
+  expect(document.documentElement).toHaveAttribute("data-theme", "dark");
 });
 
 test("a comment can be added, edited and deleted on one art piece only", async () => {
