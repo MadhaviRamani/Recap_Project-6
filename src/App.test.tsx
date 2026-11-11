@@ -442,11 +442,14 @@ describe("search in the navigation", () => {
     user: ReturnType<typeof userEvent.setup>,
     text: string
   ) {
-    await user.type(
-      await screen.findByRole("searchbox", { name: "Search art pieces" }),
-      text
+    // the field opens with a click on the magnifying glass
+    await user.click(
+      await screen.findByRole("button", { name: "Open search" })
     );
-    await user.click(screen.getByRole("button", { name: "Search" }));
+    await user.type(
+      screen.getByRole("searchbox", { name: "Search art pieces" }),
+      `${text}{Enter}`
+    );
   }
 
   test("filters the Gallery, and changing pages clears the search", async () => {
@@ -468,7 +471,7 @@ describe("search in the navigation", () => {
     expect(screen.queryByText(/Results/)).not.toBeInTheDocument();
   });
 
-  test("filters the Favorites, whose dropdown lists only their nationalities", async () => {
+  test("filters the Favorites, and the clear button in the field shows all again", async () => {
     localStorage.setItem(
       "art-pieces-info",
       JSON.stringify([
@@ -482,9 +485,7 @@ describe("search in the navigation", () => {
     expect(
       await screen.findAllByRole("img", { name: "Empty frame" })
     ).toHaveLength(1);
-    expect(
-      screen.getAllByRole("option").map((option) => option.textContent)
-    ).toEqual(["All nationalities", "Flemish"]);
+    expect(screen.queryByRole("combobox")).not.toBeInTheDocument();
 
     await search(user, "van gogh");
 
@@ -493,7 +494,9 @@ describe("search in the navigation", () => {
     // the favorite does not match, so every frame is empty
     expect(screen.getAllByRole("img", { name: "Empty frame" })).toHaveLength(2);
 
-    await user.click(screen.getByRole("button", { name: "Show all" }));
+    await user.click(
+      screen.getByRole("button", { name: "Show all art pieces" })
+    );
 
     expect(screen.getAllByRole("img", { name: "Empty frame" })).toHaveLength(1);
     expect(
@@ -522,8 +525,11 @@ describe("search in the navigation", () => {
       screen.getByRole("heading", { name: "The Harvesters" })
     ).toBeInTheDocument();
     expect(screen.queryByText(/Results/)).not.toBeInTheDocument();
-    expect(
-      screen.getByRole("searchbox", { name: "Search art pieces" })
-    ).toHaveValue("");
+    // a fresh, closed and empty search field on the new page
+    expect(screen.getByRole("button", { name: "Open search" })).toHaveAttribute(
+      "aria-expanded",
+      "false"
+    );
+    expect(document.getElementById("search-input")).toHaveValue("");
   });
 });

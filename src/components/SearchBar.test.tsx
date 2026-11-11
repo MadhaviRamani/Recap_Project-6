@@ -3,141 +3,184 @@ import userEvent from "@testing-library/user-event";
 
 import SearchBar from "./SearchBar";
 
-function renderSearchBar(onSearch = vi.fn()) {
+function renderSearchBar({
+  query = "",
+  onSearch = vi.fn(),
+  onShowAll = vi.fn(),
+} = {}) {
   render(
-    <SearchBar nationalities={["Dutch", "Japanese"]} onSearch={onSearch} />
+    <>
+      <SearchBar query={query} onSearch={onSearch} onShowAll={onShowAll} />
+      <button type="button">Outside</button>
+    </>
   );
-  return userEvent.setup();
+  return { user: userEvent.setup(), onSearch, onShowAll };
 }
 
-test("shows the search input, the nationality dropdown and the Search button in this order", () => {
+function getToggle(name: "Open search" | "Close search") {
+  return screen.getByRole("button", { name });
+}
+
+async function openSearch(user: ReturnType<typeof userEvent.setup>) {
+  await user.click(getToggle("Open search"));
+  return screen.getByRole("searchbox", { name: "Search art pieces" });
+}
+
+test("at first shows only the magnifying glass, the field is closed", () => {
   renderSearchBar();
 
-  const input = screen.getByRole("searchbox", { name: "Search art pieces" });
-  const dropdown = screen.getByRole("combobox", { name: "Nationality" });
-  const button = screen.getByRole("button", { name: "Search" });
-  expect(input.nextElementSibling).toBe(dropdown);
-  expect(dropdown.nextElementSibling).toBe(button);
-});
-
-test("the Search button shows only a magnifying glass and is named Search", () => {
-  renderSearchBar();
-
-  const button = screen.getByRole("button", { name: "Search" });
-  expect(button).toHaveAttribute("aria-label", "Search");
-  expect(button.textContent).toBe("");
-  expect(button.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
-});
-
-test("the dropdown lists all nationalities after All nationalities", () => {
-  renderSearchBar();
-
-  expect(screen.getByRole("combobox", { name: "Nationality" })).toHaveValue("");
+  const toggle = getToggle("Open search");
+  expect(toggle).toHaveAttribute("aria-expanded", "false");
+  expect(toggle).toHaveAttribute("aria-controls", "search-input");
+  expect(toggle.textContent).toBe("");
+  expect(toggle.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
+  // the closed field is hidden from screen readers and the keyboard
   expect(
-    screen.getAllByRole("option").map((option) => option.textContent)
-  ).toEqual(["All nationalities", "Dutch", "Japanese"]);
+    screen.queryByRole("searchbox", { name: "Search art pieces" })
+  ).not.toBeInTheDocument();
+  expect(
+    document.getElementById("search-input")?.parentElement
+  ).toHaveAttribute("inert");
 });
 
-test("clicking Search passes the trimmed text and the nationality, then clears both", async () => {
-  const onSearch = vi.fn();
-  const user = renderSearchBar(onSearch);
-  const input = screen.getByRole("searchbox", { name: "Search art pieces" });
-  const dropdown = screen.getByRole("combobox", { name: "Nationality" });
+test("there is no nationality dropdown", () => {
+  renderSearchBar();
 
-  await user.type(input, "  Great Wave ");
-  await user.selectOptions(dropdown, "Japanese");
+  expect(screen.queryByRole("combobox")).not.toBeInTheDocument();
+});
+
+test("the keyboard does not reach the closed field", async () => {
+  const { user } = renderSearchBar();
+
+  await user.tab();
+  expect(getToggle("Open search")).toHaveFocus();
+  await user.tab();
+  expect(screen.getByRole("button", { name: "Outside" })).toHaveFocus();
+});
+
+test("a click on the magnifying glass opens the field and focuses it", async () => {
+  const { user, onSearch } = renderSearchBar();
+
+  const input = await openSearch(user);
+
+  expect(input).toHaveFocus();
+  expect(input).toHaveAttribute("id", "search-input");
+  expect(getToggle("Close search")).toHaveAttribute("aria-expanded", "true");
   expect(onSearch).not.toHaveBeenCalled();
-  await user.click(screen.getByRole("button", { name: "Search" }));
-
-  expect(onSearch).toHaveBeenCalledWith("Great Wave", "Japanese");
-  expect(input).toHaveValue("");
-  expect(dropdown).toHaveValue("");
 });
 
-test("pressing Enter also searches, with all nationalities by default", async () => {
-  const onSearch = vi.fn();
-  const user = renderSearchBar(onSearch);
+test("Enter searches with the text without extra spaces and keeps it", async () => {
+  const { user, onSearch } = renderSearchBar();
+  const input = await openSearch(user);
 
-  await user.type(
-    screen.getByRole("searchbox", { name: "Search art pieces" }),
-    "VAN GOGH{Enter}"
-  );
+  await user.type(input, "  great \t  wave {Enter}");
 
-  expect(onSearch).toHaveBeenCalledWith("VAN GOGH", "");
+  expect(onSearch).toHaveBeenCalledTimes(1);
+  expect(onSearch).toHaveBeenCalledWith("great wave");
+  expect(input).toHaveValue("  great \t  wave ");
+  expect(getToggle("Close search")).toHaveAttribute("aria-expanded", "true");
 });
 
-describe("Search button", () => {
-  function getSearchButton() {
-    return screen.getByRole("button", { name: "Search" });
-  }
+test("a second click on the magnifying glass closes the field without searching", async () => {
+  const { user, onSearch } = renderSearchBar();
+  const input = await openSearch(user);
+  await user.type(input, "wave");
 
-  test("is disabled while there is nothing to search", () => {
-    renderSearchBar();
+  await user.click(getToggle("Close search"));
 
-    expect(getSearchButton()).toBeDisabled();
-  });
+  expect(onSearch).not.toHaveBeenCalled();
+  expect(getToggle("Open search")).toHaveAttribute("aria-expanded", "false");
+  expect(
+    screen.queryByRole("searchbox", { name: "Search art pieces" })
+  ).not.toBeInTheDocument();
 
-  test("stays disabled with only spaces, and Enter does not search", async () => {
-    const onSearch = vi.fn();
-    const user = renderSearchBar(onSearch);
-    const input = screen.getByRole("searchbox", { name: "Search art pieces" });
+  // a third click opens it again
+  await user.click(getToggle("Open search"));
+  expect(getToggle("Close search")).toHaveAttribute("aria-expanded", "true");
+});
 
-    await user.type(input, "   ");
-    expect(getSearchButton()).toBeDisabled();
+test("an empty search or only spaces does nothing", async () => {
+  const { user, onSearch } = renderSearchBar();
+  const input = await openSearch(user);
 
-    await user.type(input, "{Enter}");
-    await user.click(getSearchButton());
+  await user.type(input, "{Enter}");
+  await user.type(input, "   {Enter}");
 
-    expect(onSearch).not.toHaveBeenCalled();
-    expect(input).toHaveValue("   ");
-  });
+  expect(onSearch).not.toHaveBeenCalled();
+  expect(input).toHaveValue("   ");
+});
 
-  test("is enabled with a letter in the search field", async () => {
-    const user = renderSearchBar();
+test("Escape closes an empty field and puts the focus on the magnifying glass", async () => {
+  const { user } = renderSearchBar();
+  await openSearch(user);
 
-    await user.type(
-      screen.getByRole("searchbox", { name: "Search art pieces" }),
-      " a"
-    );
+  await user.keyboard("{Escape}");
 
-    expect(getSearchButton()).toBeEnabled();
-  });
+  expect(getToggle("Open search")).toHaveFocus();
+  expect(getToggle("Open search")).toHaveAttribute("aria-expanded", "false");
+});
 
-  test("is enabled with a chosen nationality and an empty field", async () => {
-    const onSearch = vi.fn();
-    const user = renderSearchBar(onSearch);
+test("Escape keeps a field with text open", async () => {
+  const { user } = renderSearchBar();
+  const input = await openSearch(user);
 
-    await user.selectOptions(
-      screen.getByRole("combobox", { name: "Nationality" }),
-      "Dutch"
-    );
-    expect(getSearchButton()).toBeEnabled();
-    await user.click(getSearchButton());
+  await user.type(input, "wave{Escape}");
 
-    expect(onSearch).toHaveBeenCalledWith("", "Dutch");
-  });
+  expect(getToggle("Close search")).toHaveAttribute("aria-expanded", "true");
+});
 
-  test("passes the text without extra spaces and is disabled again after the search", async () => {
-    const onSearch = vi.fn();
-    const user = renderSearchBar(onSearch);
+test("a click outside closes an empty field, but not one with text", async () => {
+  const { user } = renderSearchBar();
+  const input = await openSearch(user);
 
-    await user.type(
-      screen.getByRole("searchbox", { name: "Search art pieces" }),
-      "  great \t  wave "
-    );
-    await user.click(getSearchButton());
+  await user.type(input, "wave");
+  await user.click(screen.getByRole("button", { name: "Outside" }));
+  expect(getToggle("Close search")).toHaveAttribute("aria-expanded", "true");
 
-    expect(onSearch).toHaveBeenCalledWith("great wave", "");
-    expect(getSearchButton()).toBeDisabled();
-  });
+  await user.clear(input);
+  await user.click(screen.getByRole("button", { name: "Outside" }));
+  expect(getToggle("Open search")).toHaveAttribute("aria-expanded", "false");
+});
 
-  test("a form submitted without anything to search does not search", () => {
-    const onSearch = vi.fn();
-    renderSearchBar(onSearch);
+test("a click inside the open field keeps it open", async () => {
+  const { user } = renderSearchBar();
+  const input = await openSearch(user);
 
-    // e.g. submitted by a script; the disabled button blocks Enter and clicks
-    fireEvent.submit(screen.getByRole("search"));
+  await user.click(input);
 
-    expect(onSearch).not.toHaveBeenCalled();
-  });
+  expect(getToggle("Close search")).toHaveAttribute("aria-expanded", "true");
+});
+
+test("without an active search there is no clear button", async () => {
+  const { user } = renderSearchBar();
+  await openSearch(user);
+
+  expect(
+    screen.queryByRole("button", { name: "Show all art pieces" })
+  ).not.toBeInTheDocument();
+});
+
+test("during a search the clear button in the field shows all art pieces again", async () => {
+  const { user, onShowAll } = renderSearchBar({ query: "wave" });
+  const input = await openSearch(user);
+  await user.type(input, "wave");
+
+  const clear = screen.getByRole("button", { name: "Show all art pieces" });
+  expect(input.parentElement).toContainElement(clear);
+  expect(clear.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
+  await user.click(clear);
+
+  expect(onShowAll).toHaveBeenCalledTimes(1);
+  expect(getToggle("Open search")).toHaveAttribute("aria-expanded", "false");
+  expect(getToggle("Open search")).toHaveFocus();
+  expect(document.getElementById("search-input")).toHaveValue("");
+});
+
+test("a form submitted while the field is closed does not search", () => {
+  const { onSearch } = renderSearchBar();
+
+  fireEvent.submit(screen.getByRole("search"));
+
+  expect(onSearch).not.toHaveBeenCalled();
+  expect(getToggle("Open search")).toHaveAttribute("aria-expanded", "false");
 });

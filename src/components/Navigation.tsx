@@ -7,11 +7,12 @@ import "./Navigation.css";
 const SEARCHABLE_PATHS = new Set(["/art-pieces", "/favorites"]);
 
 type NavigationProps = {
-  // the nationalities of the art pieces on the current page and the search
-  // handler; without it, there is no search bar
+  // the active search of the current page and its handlers; without it,
+  // there is no search bar
   search?: {
-    nationalities: string[];
-    onSearch: (query: string, nationality: string) => void;
+    query: string;
+    onSearch: (query: string) => void;
+    onShowAll: () => void;
   };
 };
 
@@ -72,15 +73,6 @@ export default function Navigation({ search }: NavigationProps) {
             Art Gallery
           </span>
         </Link>
-        {/* between the logo and the links, so Tab reaches it right after the
-            logo; the key gives every page a fresh, empty search bar */}
-        {isSearchShown && (
-          <SearchBar
-            key={pathname}
-            nationalities={search.nationalities}
-            onSearch={search.onSearch}
-          />
-        )}
         <div className="navigation-links">
           {/* end: without it, the link to / would be active on every page */}
           <NavLink to="/" end>
@@ -88,6 +80,16 @@ export default function Navigation({ search }: NavigationProps) {
           </NavLink>
           <NavLink to="/art-pieces">Gallery</NavLink>
           <NavLink to="/favorites">Favorites</NavLink>
+          {/* between Favorites and the profile icon; the key gives every page
+              a fresh, closed search bar */}
+          {isSearchShown && (
+            <SearchBar
+              key={pathname}
+              query={search.query}
+              onSearch={search.onSearch}
+              onShowAll={search.onShowAll}
+            />
+          )}
           {/* only an icon is visible; the label gives it its name for screen readers */}
           <NavLink
             to="/profile"

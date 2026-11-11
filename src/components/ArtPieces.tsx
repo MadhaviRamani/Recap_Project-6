@@ -15,8 +15,6 @@ type ArtPiecesProps = {
   isFavoritesHallway?: boolean;
   // the search comes from the search bar in the navigation; "" means no filter
   searchQuery?: string;
-  nationality?: string;
-  onShowAll?: () => void;
 };
 
 export default function ArtPieces({
@@ -26,31 +24,19 @@ export default function ArtPieces({
   isHallway = false,
   isFavoritesHallway = false,
   searchQuery = "",
-  nationality = "",
-  onShowAll,
 }: ArtPiecesProps) {
-  const searchedArtPieces = searchArtPieces(
-    artPieces,
-    searchQuery,
-    nationality
-  );
+  const searchedArtPieces = searchArtPieces(artPieces, searchQuery);
   const shownArtPieces = isFavoritesHallway
     ? searchedArtPieces.filter((artPiece) =>
         isFavorite(artPiecesInfo, artPiece.slug)
       )
     : searchedArtPieces;
-  const isFiltered = searchQuery !== "" || nationality !== "";
+  const isFiltered = searchQuery !== "";
 
   const searchStatus = isFiltered && (
     <>
-      <p className="search-status">
-        Results
-        {searchQuery !== "" && <> for &ldquo;{searchQuery}&rdquo;</>}
-        {nationality !== "" && <> from {nationality} artists</>}{" "}
-        <button type="button" onClick={onShowAll}>
-          Show all
-        </button>
-      </p>
+      {/* "Show all" is the clear button in the search field */}
+      <p className="search-status">Results for &ldquo;{searchQuery}&rdquo;</p>
       {shownArtPieces.length === 0 && (
         <p className="search-status">No art pieces found</p>
       )}
