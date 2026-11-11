@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useState, type SubmitEvent } from "react";
 
 import type { ArtPiece, ArtPieceInfo } from "../types";
 import { isFavorite } from "../utils/artPiecesInfo";
@@ -34,7 +34,7 @@ export default function Profile({
     setIsEditing(true);
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
 
     // whitespace only counts as empty
