@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useState, type SubmitEvent } from "react";
 
 import type { ArtPieceComment } from "../types";
 
@@ -49,7 +49,7 @@ function CommentItem({ comment, onEdit, onDelete }: CommentItemProps) {
     setIsEditing(true);
   }
 
-  function handleSave(event: FormEvent<HTMLFormElement>) {
+  function handleSave(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
     const trimmed = draft.trim();
 
