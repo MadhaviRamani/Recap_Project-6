@@ -244,6 +244,90 @@ test.each([
   }
 );
 
+describe("empty frames", () => {
+  function renderWithFilled(filledSlugs: string[]) {
+    return render(
+      <MemoryRouter>
+        <Hallway
+          artPieces={createArtPieces(11)}
+          artPiecesInfo={[]}
+          onToggleFavorite={vi.fn()}
+          filledSlugs={filledSlugs}
+        />
+      </MemoryRouter>
+    );
+  }
+
+  test("only the filled art pieces show their image, link and favorite button", () => {
+    const { container } = renderWithFilled(["art-piece-3", "art-piece-11"]);
+
+    expect(screen.getAllByRole("listitem")).toHaveLength(11);
+    expect(screen.getAllByRole("link")).toHaveLength(2);
+    expect(screen.getAllByRole("button", { name: "Favorite" })).toHaveLength(2);
+    expect(
+      screen.getByAltText("Art Piece 3 by Artist 3").closest("a")
+    ).toHaveAttribute("href", "/art-pieces/art-piece-3");
+    expect(
+      screen.getByAltText("Art Piece 11 by Artist 11")
+    ).toBeInTheDocument();
+    expect(screen.queryByText("Art Piece 1")).not.toBeInTheDocument();
+    expect(container.querySelectorAll(".hallway-item-empty")).toHaveLength(9);
+  });
+
+  test("every other art piece hangs as an empty frame in its own place", () => {
+    renderWithFilled(["art-piece-3"]);
+
+    const leftWall = within(screen.getByRole("list", { name: "Left wall" }));
+    const items = leftWall.getAllByRole("listitem");
+    expect(items).toHaveLength(5);
+    expect(
+      within(items[2]).getByAltText("Art Piece 3 by Artist 3")
+    ).toBeInTheDocument();
+    for (const index of [0, 1, 3, 4]) {
+      expect(items[index]).toHaveClass("hallway-item-empty");
+      expect(
+        within(items[index]).getByRole("img", { name: "Empty frame" })
+      ).toBeInTheDocument();
+      expect(within(items[index]).queryByRole("link")).not.toBeInTheDocument();
+    }
+    expect(screen.getAllByRole("img", { name: "Empty frame" })).toHaveLength(
+      10
+    );
+  });
+
+  test("the keyboard skips the empty frames", async () => {
+    const user = userEvent.setup();
+    renderWithFilled(["art-piece-2", "art-piece-9"]);
+
+    await user.tab();
+    expect(
+      screen.getByAltText("Art Piece 2 by Artist 2").closest("a")
+    ).toHaveFocus();
+    await user.tab(); // its favorite button
+    await user.tab();
+    expect(
+      screen.getByAltText("Art Piece 9 by Artist 9").closest("a")
+    ).toHaveFocus();
+  });
+
+  test("without filled art pieces, every frame is empty", () => {
+    renderWithFilled([]);
+
+    expect(screen.getAllByRole("img", { name: "Empty frame" })).toHaveLength(
+      11
+    );
+    expect(screen.queryByRole("link")).not.toBeInTheDocument();
+  });
+
+  test("without filledSlugs, no frame is empty", () => {
+    renderHallway(createArtPieces(11));
+
+    expect(
+      screen.queryByRole("img", { name: "Empty frame" })
+    ).not.toBeInTheDocument();
+  });
+});
+
 describe("runway", () => {
   test("shows its content in the hallway, before the art pieces", async () => {
     const user = userEvent.setup();

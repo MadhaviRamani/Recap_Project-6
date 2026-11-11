@@ -184,11 +184,14 @@ export default function App() {
           path="/favorites"
           element={
             <>
-              <h1>Favorites</h1>
+              {/* hidden on screen, like on the Gallery */}
+              <h1 className="visually-hidden">Favorites</h1>
+              {/* every art piece has its frame, only the favorites fill it */}
               <ArtPieces
-                artPieces={favoriteArtPieces}
+                artPieces={artPieces}
                 artPiecesInfo={artPiecesInfo}
                 onToggleFavorite={handleToggleFavorite}
+                isFavoritesHallway
                 searchQuery={searchQuery}
                 nationality={searchNationality}
                 onShowAll={handleShowAll}

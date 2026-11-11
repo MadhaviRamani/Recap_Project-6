@@ -10,6 +10,9 @@ type HallwayProps = {
   artPieces: ArtPiece[];
   artPiecesInfo: ArtPieceInfo[];
   onToggleFavorite: (slug: string) => void;
+  // when given, only these art pieces fill their frame, all others hang
+  // as an empty frame (the favorites hallway); without it, all are shown
+  filledSlugs?: string[];
 };
 
 type WallProps = HallwayProps & {
@@ -26,33 +29,47 @@ function Wall({
   artPieces,
   artPiecesInfo,
   onToggleFavorite,
+  filledSlugs,
 }: WallProps) {
   return (
     <div className={`hallway-wall hallway-wall-${side}`}>
       {artPieces.length > 0 && (
         <ul className="hallway-wall-list" aria-label={label}>
-          {artPieces.map((artPiece, index) => (
-            <li
-              key={artPiece.slug}
-              className="hallway-item"
-              // the place on the wall, 1 = near the viewer; art pieces
-              // further back hang bigger and grow more on hover
-              style={{ "--hallway-place": index + 1 } as CSSProperties}
-            >
-              {/* only this part turns and grows; the list item stays on
+          {artPieces.map((artPiece, index) => {
+            const isEmpty =
+              filledSlugs !== undefined && !filledSlugs.includes(artPiece.slug);
+            return (
+              <li
+                key={artPiece.slug}
+                className={`hallway-item${isEmpty ? " hallway-item-empty" : ""}`}
+                // the place on the wall, 1 = near the viewer; art pieces
+                // further back hang bigger and grow more on hover
+                style={{ "--hallway-place": index + 1 } as CSSProperties}
+              >
+                {/* only this part turns and grows; the list item stays on
                   the wall, so the mouse does not lose it */}
-              <div className="hallway-item-art">
-                {/* the royal lamp and its light are only decoration */}
-                <span className="hallway-lamp" aria-hidden="true" />
-                <span className="hallway-light" aria-hidden="true" />
-                <ArtPiecePreview
-                  artPiece={artPiece}
-                  isFavorite={isFavorite(artPiecesInfo, artPiece.slug)}
-                  onToggleFavorite={onToggleFavorite}
-                />
-              </div>
-            </li>
-          ))}
+                <div className="hallway-item-art">
+                  {/* the royal lamp and its light are only decoration */}
+                  <span className="hallway-lamp" aria-hidden="true" />
+                  <span className="hallway-light" aria-hidden="true" />
+                  {isEmpty ? (
+                    // no image, no link and no button, so the keyboard skips it
+                    <div
+                      className="hallway-empty-frame"
+                      role="img"
+                      aria-label="Empty frame"
+                    />
+                  ) : (
+                    <ArtPiecePreview
+                      artPiece={artPiece}
+                      isFavorite={isFavorite(artPiecesInfo, artPiece.slug)}
+                      onToggleFavorite={onToggleFavorite}
+                    />
+                  )}
+                </div>
+              </li>
+            );
+          })}
         </ul>
       )}
     </div>
@@ -65,13 +82,14 @@ export default function Hallway({
   artPieces,
   artPiecesInfo,
   onToggleFavorite,
+  filledSlugs,
   runway,
 }: HallwayProps & {
   // shown flat on the near end of the runway, e.g. the search status
   runway?: ReactNode;
 }) {
   const walls = splitIntoWalls(artPieces);
-  const wallProps = { artPiecesInfo, onToggleFavorite };
+  const wallProps = { artPiecesInfo, onToggleFavorite, filledSlugs };
 
   return (
     <div className="hallway">

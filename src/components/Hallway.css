@@ -255,15 +255,17 @@ main:has(.hallway) {
 
 /* the art piece the user points at (or reaches with the keyboard) stays in
    front of its neighbours */
-.hallway-item:is(:hover, :focus-within) {
+.hallway-item:not(.hallway-item-empty):is(:hover, :focus-within) {
   z-index: 4;
 }
 
 /* on a side wall it comes towards the viewer, comes out of the wall far
    enough not to stick into it, turns to face the viewer and grows */
-.hallway-wall-left .hallway-item:is(:hover, :focus-within) > .hallway-item-art,
+.hallway-wall-left
+  .hallway-item:not(.hallway-item-empty):is(:hover, :focus-within)
+  > .hallway-item-art,
 .hallway-wall-right
-  .hallway-item:is(:hover, :focus-within)
+  .hallway-item:not(.hallway-item-empty):is(:hover, :focus-within)
   > .hallway-item-art {
   transform: translateX(
       calc(var(--hallway-toward-viewer) * var(--hallway-forward))
@@ -274,17 +276,21 @@ main:has(.hallway) {
 
 /* on the front wall it faces the viewer already and only grows */
 .hallway-wall-front
-  .hallway-item:is(:hover, :focus-within)
+  .hallway-item:not(.hallway-item-empty):is(:hover, :focus-within)
   > .hallway-item-art {
   transform: scale(1.3);
 }
 
 /* its neighbours move aside, so the grown art piece does not cover them */
-.hallway-item:is(:hover, :focus-within) + .hallway-item > .hallway-item-art {
+.hallway-item:not(.hallway-item-empty):is(:hover, :focus-within)
+  + .hallway-item
+  > .hallway-item-art {
   transform: translateX(var(--hallway-push));
 }
 
-.hallway-item:has(+ .hallway-item:is(:hover, :focus-within))
+.hallway-item:has(
+    + .hallway-item:not(.hallway-item-empty):is(:hover, :focus-within)
+  )
   > .hallway-item-art {
   transform: translateX(calc(-1 * var(--hallway-push)));
 }
@@ -376,7 +382,8 @@ main:has(.hallway) {
 
 /* the royal golden frame: the image sits on a linen mat inside a wide
    gilded frame with carved edges, and casts a soft shadow onto the wall */
-.hallway .art-piece img {
+.hallway .art-piece img,
+.hallway-empty-frame {
   width: auto;
   max-width: none;
   height: 15rem;
@@ -419,13 +426,24 @@ main:has(.hallway) {
 /* on the side walls the art pieces further back hang bigger, so the far
    ones are easier to see (15rem near, up to 19.5rem far) */
 .hallway-wall-left .art-piece img,
-.hallway-wall-right .art-piece img {
+.hallway-wall-right .art-piece img,
+.hallway-wall-left .hallway-empty-frame,
+.hallway-wall-right .hallway-empty-frame {
   height: calc(15rem + max(0, var(--hallway-place, 1) - 2) * 1.5rem);
 }
 
 /* the front wall is far away, so its art piece is larger */
-.hallway-wall-front .art-piece img {
+.hallway-wall-front .art-piece img,
+.hallway-wall-front .hallway-empty-frame {
   height: 26rem;
+}
+
+/* the empty frame of an art piece that is not a favorite: the golden
+   frame with an empty linen mat, in portrait format; the height comes
+   from the frame rules above */
+.hallway-empty-frame {
+  display: block;
+  aspect-ratio: 4 / 5;
 }
 
 /* the name and artist like a small museum label under the frame */
@@ -537,8 +555,12 @@ main:has(.hallway) {
 
   /* the art pieces are stacked and as wide as the screen, so they do not
      grow; growing would make the page scroll sideways */
-  .hallway .hallway-wall .hallway-item .hallway-item-art {
+  .hallway .hallway-wall .hallway-wall-list .hallway-item .hallway-item-art {
     transform: none;
+  }
+
+  .hallway .hallway-wall .hallway-empty-frame {
+    height: 15rem;
   }
 
   .hallway .hallway-wall,

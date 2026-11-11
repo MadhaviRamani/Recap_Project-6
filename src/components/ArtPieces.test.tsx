@@ -149,6 +149,60 @@ describe("hallway", () => {
   });
 });
 
+describe("favorites hallway", () => {
+  function renderFavoritesHallway(searchQuery = "") {
+    return render(
+      <MemoryRouter>
+        <ArtPieces
+          artPieces={artPieces}
+          artPiecesInfo={[
+            { slug: "the-harvesters", isFavorite: true, comments: [] },
+          ]}
+          onToggleFavorite={vi.fn()}
+          isFavoritesHallway
+          searchQuery={searchQuery}
+          onShowAll={vi.fn()}
+        />
+      </MemoryRouter>
+    );
+  }
+
+  test("hangs a frame for every art piece, only the favorites fill theirs", () => {
+    renderFavoritesHallway();
+
+    expect(screen.getByRole("list", { name: "Left wall" })).toBeInTheDocument();
+    expect(screen.getAllByRole("listitem")).toHaveLength(2);
+    expect(
+      screen.getByRole("heading", { name: "The Harvesters" })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("img", { name: "Empty frame" })
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("heading", { name: "Wheat Field with Cypresses" })
+    ).not.toBeInTheDocument();
+  });
+
+  test("a search leaves the favorites that do not match empty", () => {
+    const { container } = renderFavoritesHallway("van gogh");
+
+    expect(screen.getAllByRole("img", { name: "Empty frame" })).toHaveLength(2);
+    const runway = container.querySelector(".hallway-runway");
+    expect(runway).toContainElement(screen.getByText(/Results for “van gogh”/));
+    expect(runway).toContainElement(screen.getByText("No art pieces found"));
+  });
+
+  test("a matching favorite stays filled", () => {
+    renderFavoritesHallway("harvesters");
+
+    expect(
+      screen.getByRole("heading", { name: "The Harvesters" })
+    ).toBeInTheDocument();
+    expect(screen.getAllByRole("img", { name: "Empty frame" })).toHaveLength(1);
+    expect(screen.queryByText("No art pieces found")).not.toBeInTheDocument();
+  });
+});
+
 describe("search", () => {
   function renderSearchedArtPieces({
     isHallway = false,
