@@ -29,7 +29,7 @@ Art gallery app (Recap Project 6): four pages — Spotlight, Gallery, Favorites,
 - Fetch the art pieces once in `App.tsx` with `useSWR` and pass them down as props. The `fetcher` returns a typed `ArtPiece[]` and throws an `Error` when the response is not `ok` (otherwise SWR never reports an error). Pages show loading and error states.
 - `ArtPiece` lives in `src/types.ts` and types only the properties actually used.
 - Never mutate fetched art pieces. User data (favorites, comments) is a separate state in `App` (the component that renders `Routes`), keyed by `slug`, e.g. `ArtPieceInfo { slug, isFavorite, comments }`. Comment dates are stored as ISO strings.
-- Bonus persistence: only `ArtPieceInfo` goes to `localStorage` (lazy `useState` initializer to read, `useEffect` to write); the app must work with empty storage.
+- Bonus persistence: only user data goes to `localStorage` — `ArtPieceInfo` (`src/utils/artPiecesInfoStorage.ts`) plus the profile name and dark mode setting (`src/utils/profileStorage.ts`), never the fetched art pieces (lazy `useState` initializer to read, `useEffect` to write); the app must work with empty storage.
 - Navigation is a single `Navigation` component rendered once, using `NavLink` (`end` on the `/` link). Unknown URLs show "Page not found". The gallery route is `/art-pieces`.
 - Type all props, state and fetched data.
 - Tests sit next to their component (`Navigation.test.tsx`). Wrap components containing `Link`/`NavLink` in `MemoryRouter`. Vitest file patterns must cover `.ts` and `.tsx` (`src/**/*.{ts,tsx}`).
