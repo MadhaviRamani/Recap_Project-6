@@ -227,7 +227,13 @@ test("the Favorites page shows only the favorite art pieces", async () => {
   expect(
     screen.getByRole("heading", { level: 1, name: "Favorites" })
   ).toBeInTheDocument();
-  expect(screen.getAllByRole("listitem")).toHaveLength(1);
+  // the favorites hang in the hallway: a frame for every art piece, only
+  // the favorite fills its frame
+  expect(screen.getByRole("list", { name: "Left wall" })).toBeInTheDocument();
+  expect(screen.getAllByRole("img", { name: "Empty frame" })).toHaveLength(1);
+  expect(
+    screen.queryByRole("heading", { name: "Wheat Field with Cypresses" })
+  ).not.toBeInTheDocument();
   expect(
     screen.getByRole("img", {
       name: "The Harvesters by Pieter Bruegel the Elder",
@@ -243,7 +249,7 @@ test("the Favorites page shows only the favorite art pieces", async () => {
   );
 });
 
-test("removing a favorite on the Favorites page removes it from the list", async () => {
+test("removing a favorite on the Favorites page empties its frame", async () => {
   const user = userEvent.setup();
   mockFetch({ ok: true, data: artPieces });
 
@@ -253,10 +259,13 @@ test("removing a favorite on the Favorites page removes it from the list", async
   await user.click(screen.getByRole("link", { name: "Favorites" }));
   await user.click(screen.getByRole("button", { name: "Favorite" }));
 
-  expect(screen.queryAllByRole("listitem")).toHaveLength(0);
+  expect(screen.getAllByRole("img", { name: "Empty frame" })).toHaveLength(2);
+  expect(
+    screen.queryByRole("heading", { name: "The Harvesters" })
+  ).not.toBeInTheDocument();
 });
 
-test("the Favorites page shows an empty list without favorites", async () => {
+test("the Favorites page shows only empty frames without favorites", async () => {
   mockFetch({ ok: true, data: artPieces });
 
   renderApp("/favorites");
@@ -264,7 +273,8 @@ test("the Favorites page shows an empty list without favorites", async () => {
   expect(
     await screen.findByRole("heading", { level: 1, name: "Favorites" })
   ).toBeInTheDocument();
-  expect(screen.queryAllByRole("listitem")).toHaveLength(0);
+  expect(screen.getAllByRole("img", { name: "Empty frame" })).toHaveLength(2);
+  expect(screen.queryByRole("link", { name: /by/ })).not.toBeInTheDocument();
 });
 
 test("the Profile page shows the counts and updates the favorites count", async () => {
@@ -419,10 +429,10 @@ test("starts with the favorites saved in the local storage", async () => {
 
   renderApp("/favorites");
 
-  expect(await screen.findAllByRole("listitem")).toHaveLength(1);
   expect(
-    screen.getByRole("heading", { name: "The Harvesters" })
+    await screen.findByRole("heading", { name: "The Harvesters" })
   ).toBeInTheDocument();
+  expect(screen.getAllByRole("img", { name: "Empty frame" })).toHaveLength(1);
 });
 
 describe("search in the navigation", () => {
@@ -467,7 +477,9 @@ describe("search in the navigation", () => {
     mockFetch({ ok: true, data: artPieces });
 
     renderApp("/favorites");
-    expect(await screen.findAllByRole("listitem")).toHaveLength(1);
+    expect(
+      await screen.findAllByRole("img", { name: "Empty frame" })
+    ).toHaveLength(1);
     expect(
       screen.getAllByRole("option").map((option) => option.textContent)
     ).toEqual(["All nationalities", "Flemish"]);
@@ -476,11 +488,15 @@ describe("search in the navigation", () => {
 
     expect(screen.getByText(/Results for “van gogh”/)).toBeInTheDocument();
     expect(screen.getByText("No art pieces found")).toBeInTheDocument();
-    expect(screen.queryAllByRole("listitem")).toHaveLength(0);
+    // the favorite does not match, so every frame is empty
+    expect(screen.getAllByRole("img", { name: "Empty frame" })).toHaveLength(2);
 
     await user.click(screen.getByRole("button", { name: "Show all" }));
 
-    expect(screen.getAllByRole("listitem")).toHaveLength(1);
+    expect(screen.getAllByRole("img", { name: "Empty frame" })).toHaveLength(1);
+    expect(
+      screen.getByRole("heading", { name: "The Harvesters" })
+    ).toBeInTheDocument();
     expect(screen.queryByText(/Results/)).not.toBeInTheDocument();
   });
 
@@ -499,7 +515,7 @@ describe("search in the navigation", () => {
     await search(user, "van gogh");
     await user.click(screen.getByRole("link", { name: "Favorites" }));
 
-    expect(screen.getAllByRole("listitem")).toHaveLength(1);
+    expect(screen.getAllByRole("img", { name: "Empty frame" })).toHaveLength(1);
     expect(
       screen.getByRole("heading", { name: "The Harvesters" })
     ).toBeInTheDocument();

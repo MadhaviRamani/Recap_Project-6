@@ -10,6 +10,9 @@ type ArtPiecesProps = {
   onToggleFavorite: (slug: string) => void;
   // the gallery hangs in a hallway; the favorites stay a list
   isHallway?: boolean;
+  // the favorites hallway: a frame for every art piece, only the
+  // favorites fill theirs, all others stay empty
+  isFavoritesHallway?: boolean;
   // the search comes from the search bar in the navigation; "" means no filter
   searchQuery?: string;
   nationality?: string;
@@ -21,11 +24,21 @@ export default function ArtPieces({
   artPiecesInfo,
   onToggleFavorite,
   isHallway = false,
+  isFavoritesHallway = false,
   searchQuery = "",
   nationality = "",
   onShowAll,
 }: ArtPiecesProps) {
-  const shownArtPieces = searchArtPieces(artPieces, searchQuery, nationality);
+  const searchedArtPieces = searchArtPieces(
+    artPieces,
+    searchQuery,
+    nationality
+  );
+  const shownArtPieces = isFavoritesHallway
+    ? searchedArtPieces.filter((artPiece) =>
+        isFavorite(artPiecesInfo, artPiece.slug)
+      )
+    : searchedArtPieces;
   const isFiltered = searchQuery !== "" || nationality !== "";
 
   const searchStatus = isFiltered && (
@@ -44,14 +57,19 @@ export default function ArtPieces({
     </>
   );
 
-  // the gallery hangs in a 3D hallway, with the search status on its runway;
-  // the hallway stays when nothing matches
-  if (isHallway) {
+  // the gallery and the favorites hang in a 3D hallway, with the search
+  // status on its runway; the hallway stays when nothing matches
+  if (isHallway || isFavoritesHallway) {
     return (
       <Hallway
-        artPieces={shownArtPieces}
+        artPieces={isFavoritesHallway ? artPieces : shownArtPieces}
         artPiecesInfo={artPiecesInfo}
         onToggleFavorite={onToggleFavorite}
+        filledSlugs={
+          isFavoritesHallway
+            ? shownArtPieces.map((artPiece) => artPiece.slug)
+            : undefined
+        }
         runway={searchStatus || undefined}
       />
     );
